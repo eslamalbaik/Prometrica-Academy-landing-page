@@ -1,0 +1,287 @@
+{
+  "free": "Free",
+  "enroll_now": "Enroll Now",
+  "enrolling": "Enrolling...",
+  "go_to_course": "Open Course",
+  "open_course": "Open Course",
+  "reply_placeholder": "Write a reply...",
+  "navbar": {
+    "my_dashboard": "My Dashboard",
+    "admin_dashboard": "My Admin Panel",
+    "my_courses": "My Courses",
+    "my_account": "My Account",
+    "logout": "Logout",
+    "programs": "Programs",
+    "why_us": "Why Us",
+    "courses": "Courses",
+    "speakers": "Speakers",
+    "contact": "Contact",
+    "change_lang": "العربية",
+    "login": "Log in",
+    "register": "Register"
+  },
+  "auth": {
+    "login_title": "Welcome Back 👋🏻",
+    "register_title": "Adventure starts here 🚀",
+    "email_label": "Email Address",
+    "password_label": "Password",
+    "name_label": "Full Name",
+    "confirm_password_label": "Confirm Password",
+    "login_btn": "Login",
+    "register_btn": "Sign Up",
+    "forgot_password": "Forgot Password?",
+    "dont_have_account": "New on our platform?",
+    "already_have_account": "Already have an account?",
+    "sign_up_now": "Create an account",
+    "login_now": "Sign in instead",
+    "continue_with_google": "Continue with Google",
+    "or_email": "or continue with email",
+    "google_setup_hint": "Add Google API keys on the server, then set VITE_GOOGLE_AUTH_ENABLED=true.",
+    "google_not_configured": "Google sign-in will be enabled once API keys are added to the server.",
+    "google_pending": "Google sign-in is being set up. Please use email for now.",
+    "login_hero_title": "Your pharmacy career starts here",
+    "login_hero_subtitle": "Sign in to access your courses, track progress, and continue learning.",
+    "register_hero_title": "Join thousands of pharmacists",
+    "register_hero_subtitle": "Create your free account and start learning with expert-led courses.",
+    "login_card_subtitle": "One account for all Prometrica programs.",
+    "register_card_subtitle": "Takes less than a minute — no credit card required.",
+    "invalid_credentials": "Invalid email or password.",
+    "network_error": "Could not reach the server. Is the API running on port 8000?",
+    "success": "Success!",
+    "name_required": "Name is required",
+    "email_required": "Email is required",
+    "password_min": "Password must be at least 6 characters",
+    "password_mismatch": "Passwords do not match",
+    "terms_required": "Please accept the terms to continue",
+    "agree_terms": "I agree to the terms of service and privacy policy",
+    "hero_feature_1": "Structured courses for licensing exams",
+    "hero_feature_2": "Secure account and progress tracking",
+    "hero_feature_3": "Learn anywhere, anytime",
+    "copyright": "© Prometrica Academy",
+    "toggle_password": "Show or hide password",
+    "too_many_attempts": "Too many attempts. Please wait a minute and try again.",
+    "server_error": "Server error. Please try again later."
+  },
+  "placeholders": {
+    "enter_email": "enter your email",
+    "enter_password": "enter your password",
+    "enter_name": "enter your full name"
+  },
+  "landing": {
+    "announcement": {
+      "t1": "Online pharmacy education worldwide",
+      "t2": "Pharmacist community",
+      "t3": "Free starter materials available"
+    },
+    "hero": {
+      "badge": "Learning platform for healthcare professionals",
+      "h1_1": "The platform that turns pharmacists into",
+      "h1_2": "licensed experts.",
+      "desc": "Prometrica Academy delivers strategic learning paths, realistic exams, and complete professional development — built so pharmacists pass Prometric exams and excel in competitive job markets.",
+      "btn1": "Register & Get Gifts",
+      "btn2": "Explore Programs",
+      "feat1": "Globally aligned",
+      "feat2": "98% pass rate",
+      "feat3": "Live mentorship"
+    },
+    "why": {
+      "badge": "Why Prometrica",
+      "title1": "Built for pharmacists who want to ",
+      "title2": "win the exam.",
+      "c1": {
+        "title": "Learn from anywhere",
+        "text": "Fully online platform built for pharmacists worldwide."
+      },
+      "c2": {
+        "title": "Elite faculty",
+        "text": "Lectures led by top clinical experts and exam strategists."
+      },
+      "c3": {
+        "title": "Every specialty",
+        "text": "Curricula covering Prometric, clinical, and practice areas."
+      },
+      "c4": {
+        "title": "Free starter materials",
+        "text": "Sample question banks and study guides on signup."
+      }
+    },
+    "about": {
+      "title1": "Educational webinars and courses for ",
+      "title2": "pharmacists and doctors.",
+      "desc": "Stay at the edge of healthcare with our specialist webinars. Build deep understanding, present your expertise, and grow your professional reach.",
+      "btn": "Learn more"
+    },
+    "programs": {
+      "badge": "Core Solutions",
+      "title": "Our academic programs",
+      "desc": "Six interlocking programs that take you from foundation to licensure to a flourishing career.",
+      "c1": {
+        "title": "Prometric Prep",
+        "text": "Intensive, targeted programs to pass health professional certification exams."
+      },
+      "c2": {
+        "title": "Clinical Pharmacy",
+        "text": "Develop evidence-based decision-making for real clinical practice."
+      },
+      "c3": {
+        "title": "Mock Exams",
+        "text": "Realistic simulations of testing environments to assess readiness."
+      },
+      "c4": {
+        "title": "Interview Readiness",
+        "text": "Pass interviews at leading hospitals and pharmaceutical companies."
+      },
+      "c5": {
+        "title": "Modern Practice",
+        "text": "Stay current with the latest treatment protocols and guidelines."
+      },
+      "c6": {
+        "title": "Strategic Mentorship",
+        "text": "Custom study plans tailored to your level and target exam date."
+      }
+    },
+    "courses": {
+      "badge": "Live Courses",
+      "title": "Courses",
+      "viewAll": "View all →",
+      "loadMore": "Load more",
+      "viewCourse": "View Course",
+      "lessons": "lessons"
+    },
+    "stats": {
+      "s1": "Years of Experience",
+      "s2": "Certified Pharmacists",
+      "s3": "Exam Pass Rate",
+      "s4": "Academic Support"
+    },
+    "trust": {
+      "badge": "Confidence",
+      "title1": "Why do elite pharmacists ",
+      "title2": "trust us?",
+      "c1": {
+        "title": "Elite Faculty",
+        "text": "A select group of lecturers and clinical experts guiding every cohort."
+      },
+      "c2": {
+        "title": "Continuous Updates",
+        "text": "Medical curricula refreshed against the latest international standards."
+      },
+      "c3": {
+        "title": "Flexible Distance Learning",
+        "text": "Access world-class training from anywhere, at your own pace."
+      },
+      "c4": {
+        "title": "Smart Exam Strategies",
+        "text": "Innovative test-solving frameworks engineered for high-pressure exams."
+      },
+      "c5": {
+        "title": "24/7 Support",
+        "text": "Ongoing technical and academic support whenever you need it."
+      },
+      "c6": {
+        "title": "Career Insight",
+        "text": "A complete view of the medical job market and hiring landscape."
+      }
+    },
+    "process": {
+      "badge": "The Journey",
+      "title1": "Your steps toward ",
+      "title2": "professional certification.",
+      "step": "Step",
+      "s1": {
+        "title": "Discovery & Analysis",
+        "text": "Initial assessment to determine your current level and gaps."
+      },
+      "s2": {
+        "title": "Personalized Plan",
+        "text": "A tailored roadmap built around your exam date and goal."
+      },
+      "s3": {
+        "title": "Interactive Learning",
+        "text": "Live sessions, recorded modules, and case-based practice."
+      },
+      "s4": {
+        "title": "Mock Exams & Review",
+        "text": "Realistic simulations with deep diagnostic feedback."
+      },
+      "s5": {
+        "title": "Certification & Success",
+        "text": "Pass your licensing exam and step into your career."
+      }
+    },
+    "testimonials": {
+      "badge": "Voices",
+      "title": "Trusted by pharmacists worldwide.",
+      "t1": {
+        "q": "Prometrica Academy completely changed my study method, and I passed the licensing exam on my first attempt.",
+        "a": "Layla H.",
+        "r": "Licensed Pharmacist"
+      },
+      "t2": {
+        "q": "The level of professionalism and the practice questions were exceptional and realistic.",
+        "a": "Omar S.",
+        "r": "Clinical Pharmacist"
+      },
+      "t3": {
+        "q": "Finally, an educational partner that focuses on deep understanding and confidence — not rote memorization.",
+        "a": "Dr. Sara M.",
+        "r": "Hospital Pharmacist"
+      }
+    },
+    "cta": {
+      "title1": "Build your pharmacy career ",
+      "title2": "with confidence.",
+      "desc": "Begin your journey with Prometrica Academy to secure your professional license, sharpen your clinical knowledge, and excel in healthcare.",
+      "btn1": "Start Your Journey",
+      "btn2": "Contact Advisor"
+    }
+  },
+  "tab_subscriptions": "Subscriptions",
+  "tab_courses": "Courses",
+  "tab_certificates": "Certificates",
+  "tab_account": "Account",
+  "tab_profile": "Profile",
+  "tab_change_password": "Change Password",
+  "tab_help": "Help",
+  "account_details": "Account Details",
+  "first_name": "First Name",
+  "last_name": "Last Name",
+  "phone": "Phone Number",
+  "email": "Email Address",
+  "update_account": "Update Account",
+  "current_password": "Current Password",
+  "new_password": "New Password",
+  "confirm_new_password": "Confirm New Password",
+  "update_password": "Update Password",
+  "favorites": "Favorites",
+  "watching_now": "Watching Now",
+  "archived": "Archived",
+  "no_courses_watched": "You haven't watched any courses yet",
+  "no_certificates_yet": "No certificates yet",
+  "click_here_for_help": "Click here for help",
+  "help_contact_text": "If you need any assistance, please contact our support team at:",
+  "password_preview": "Password Preview",
+  "progress": "Progress",
+  "curriculum": "Curriculum",
+  "mark_complete": "Mark as Complete & Continue",
+  "overview": "Overview",
+  "q_a": "Q&A / Comments",
+  "reviews": "Course Reviews",
+  "lesson": "Lesson",
+  "sec": "Sec",
+  "completed": "completed",
+  "no_lessons": "No lessons uploaded.",
+  "curriculum_empty": "Curriculum empty.",
+  "video_not_available": "Video not available for this lesson.",
+  "welcome_course": "Welcome to the Course!",
+  "welcome_course_desc": "Select a module and lesson from the curriculum sidebar to begin your learning journey.",
+  "post": "Post",
+  "reply": "Reply",
+  "based_on_reviews": "Based on {{count}} reviews",
+  "leave_review": "Leave a Review",
+  "your_rating": "Your Rating",
+  "submit_review": "Submit Review",
+  "write_review_placeholder": "Write your review here...",
+  "ask_question_placeholder": "Ask a question or add a comment...",
+  "clear_selection": "Clear Choice"
+}
