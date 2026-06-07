@@ -24,6 +24,7 @@ export interface QuizSubmitResult {
   passed: boolean
   progress_percentage?: number
   score?: number
+  is_course_completed?: boolean
 }
 
 interface QuizPlayerProps {

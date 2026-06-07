@@ -89,12 +89,8 @@ function LoginPage() {
   const registerHref = to ? `/register?to=${encodeURIComponent(to)}` : '/register'
 
   const oauthMessage = errorCode === 'google_not_configured'
-    ? t('auth.google_not_configured', 'Google sign-in will be enabled once API keys are added to the server.')
-    : errorCode === 'google_pending'
-      ? t('auth.google_pending', 'Google sign-in is being set up. Please use email for now.')
-      : errorCode === 'google_callback_pending'
-        ? t('auth.google_pending', 'Google sign-in is being set up. Please use email for now.')
-        : null
+    ? t('auth.google_not_configured', 'Google sign-in is not configured on this server.')
+    : null
 
   return (
     <AuthLayout>
@@ -153,12 +149,12 @@ function LoginPage() {
           <div className="space-y-2">
             <div className="flex items-center justify-between gap-2">
               <Label htmlFor="password">{t('auth.password_label')}</Label>
-              <a
-                href={`${FRONTEND_URL}/forgot-password`}
+              <Link
+                to="/forgot-password"
                 className="text-xs text-primary hover:underline font-semibold"
               >
                 {t('auth.forgot_password')}
-              </a>
+              </Link>
             </div>
             <div className="relative">
               <Input

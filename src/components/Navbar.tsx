@@ -24,6 +24,7 @@ export function Navbar({ variant = "transparent" }: { variant?: "transparent" | 
     { href: "#programs", label: t('navbar.programs') },
     { href: "#why", label: t('navbar.why_us') },
     { href: "#courses", label: t('navbar.courses') },
+    { href: "/store", label: t('navbar.store', 'Store') },
     { href: "#speakers", label: t('navbar.speakers') },
     { href: "#contact", label: t('navbar.contact') },
   ];
@@ -83,6 +84,8 @@ export function Navbar({ variant = "transparent" }: { variant?: "transparent" | 
                   ) : (
                     <>
                       <Link to="/student/dashboard" className="px-3 py-2 text-sm text-foreground hover:bg-accent/10 rounded-md">{t('navbar.my_courses')}</Link>
+                      <Link to="/student/library" className="px-3 py-2 text-sm text-foreground hover:bg-accent/10 rounded-md">{t('navbar.my_library', 'My Library')}</Link>
+                      <Link to="/store" className="px-3 py-2 text-sm text-foreground hover:bg-accent/10 rounded-md">{t('navbar.store', 'Store')}</Link>
                       <Link to="/student/dashboard" className="px-3 py-2 text-sm text-foreground hover:bg-accent/10 rounded-md">{t('navbar.my_account')}</Link>
                     </>
                   )}

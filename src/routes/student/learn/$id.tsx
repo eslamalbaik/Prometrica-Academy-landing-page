@@ -2,10 +2,11 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect, useCallback } from "react";
 import { api } from "@/lib/api";
+import { CourseVideoPlayer } from "@/components/video/CourseVideoPlayer";
+import { UpsellModal } from "@/components/course/UpsellModal";
 import { useTranslation } from "react-i18next";
 import { PlayCircle, CheckCircle2, ChevronDown, ArrowLeft, Loader2, Play, Lock, BookOpen, Clock, MessageSquare, Star, ThumbsUp, MessageCircle, Send } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import ReactPlayer from 'react-player';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
@@ -15,8 +16,6 @@ import { Award } from 'lucide-react';
 import { QuizPlayer, type QuizSubmitResult } from '@/components/quiz/QuizPlayer';
 import { findNextLessonAfterQuiz } from '@/lib/courseCurriculum';
 import { pageTitle } from '@/lib/siteMeta';
-
-const Player = ReactPlayer as any;
 
 export const Route = createFileRoute("/student/learn/$id")({
   head: () => ({
@@ -67,6 +66,12 @@ function CoursePlayer() {
   const passedQuizIds: number[] = response?.passed_quiz_ids || [];
   const courseProgressPercent: number | undefined = response?.progress_percentage;
 
+  // Tiered entitlements (backend is the source of truth; default = unlocked).
+  const entitlements = response?.entitlements ?? { has_quizzes: true, has_files: true, has_certificate: true };
+  const packages = response?.packages ?? [];
+  const quizzesLocked = entitlements?.has_quizzes === false;
+  const [upsell, setUpsell] = useState<{ open: boolean; feature: string | null }>({ open: false, feature: null });
+
   useEffect(() => {
     if (course?.title)
       document.title = pageTitle(course.title)
@@ -90,6 +95,13 @@ function CoursePlayer() {
   const activeItemType = activeItemTypeState;
 
   const comments = activeLesson?.comments || [];
+
+  // Server-confirmed (anti-cheat) auto-completion → refresh progress silently.
+  const handleVideoAutoCompleted = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ['student-course', id] });
+    queryClient.invalidateQueries({ queryKey: ['my-dashboard-data'] });
+    toast.success(t('lesson_auto_completed', 'Lesson marked complete — great job!'));
+  }, [queryClient, id, t]);
 
   useEffect(() => {
     if (computedModules.length > 0 && !activeItemId) {
@@ -142,6 +154,10 @@ function CoursePlayer() {
 
     await queryClient.invalidateQueries({ queryKey: ['student-course', id] });
     await queryClient.invalidateQueries({ queryKey: ['my-dashboard-data'] });
+
+    if (result.is_course_completed) {
+      setShowCelebration(true);
+    }
   }, [activeQuiz?.id, id, queryClient]);
 
   const handleContinueAfterQuiz = useCallback(async () => {
@@ -353,13 +369,10 @@ function CoursePlayer() {
                     allowFullScreen
                   />
                 ) : (
-                  <Player 
-                    url={activeLesson.video_url}
-                    width="100%"
-                    height="100%"
-                    controls={true}
-                    playing={false}
-                    className="absolute top-0 left-0"
+                  <CourseVideoPlayer
+                    src={activeLesson.video_url}
+                    lessonId={activeLesson.id}
+                    onAutoCompleted={handleVideoAutoCompleted}
                   />
                 )
               ) : (
@@ -720,18 +733,24 @@ function CoursePlayer() {
                               const isActive = activeItemId === item.id && activeItemTypeState === item.item_type;
                               const isLessonCompleted = item.item_type === 'lesson' && completedLessonIds.includes(item.id);
                               const isQuizPassed = item.item_type === 'quiz' && passedQuizIds.includes(item.id);
-                              
+                              const isLocked = item.item_type === 'quiz' && quizzesLocked;
+
                               return (
-                                <button 
+                                <button
                                   key={`${item.item_type}-${item.id}`}
-                                  onClick={() => { setActiveItemId(item.id); setActiveItemTypeState(item.item_type); }}
-                                  className={`flex w-full items-start gap-3 p-3 text-start transition hover:bg-secondary focus:outline-none ${isActive ? 'bg-emerald-50/50 relative' : ''}`}
+                                  onClick={() => {
+                                    if (isLocked) { setUpsell({ open: true, feature: 'has_quizzes' }); return; }
+                                    setActiveItemId(item.id); setActiveItemTypeState(item.item_type);
+                                  }}
+                                  className={`flex w-full items-start gap-3 p-3 text-start transition hover:bg-secondary focus:outline-none ${isActive ? 'bg-emerald-50/50 relative' : ''} ${isLocked ? 'opacity-70' : ''}`}
                                   dir="auto"
                                 >
                                   {isActive && <div className="absolute start-0 top-0 h-full w-1 bg-emerald-500" />}
-                                  
+
                                   <div className="mt-0.5 shrink-0">
-                                    {item.item_type === 'lesson' ? (
+                                    {isLocked ? (
+                                      <Lock className="h-4 w-4 text-amber-500" />
+                                    ) : item.item_type === 'lesson' ? (
                                       isLessonCompleted ? (
                                         <CheckCircle2 className="h-4 w-4 text-emerald-500" />
                                       ) : isActive ? (
@@ -756,6 +775,8 @@ function CoursePlayer() {
                                     <div className="mt-1 flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
                                       {item.item_type === 'lesson' ? (
                                         <><Clock className="h-3 w-3" /> {item.duration_minutes || 0}m</>
+                                      ) : isLocked ? (
+                                        <><Lock className="h-3 w-3" /> {t('quiz_locked', 'Quiz • Locked')}</>
                                       ) : (
                                         <><CheckCircle2 className="h-3 w-3" /> Quiz • {item.passing_score}% pass</>
                                       )}
@@ -841,6 +862,19 @@ function CoursePlayer() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Lock & Upsell modal for tier-gated features */}
+      <UpsellModal
+        open={upsell.open}
+        feature={upsell.feature}
+        requiredTier={(entitlements as any)?.required_tier}
+        packages={packages}
+        onClose={() => setUpsell({ open: false, feature: null })}
+        onChoose={() => {
+          setUpsell({ open: false, feature: null });
+          navigate({ to: '/courses/$id', params: { id: String(id) } } as any);
+        }}
+      />
     </div>
   );
 }

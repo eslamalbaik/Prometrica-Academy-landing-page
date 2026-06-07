@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   GraduationCap, Stethoscope, ClipboardCheck, MessageSquare,
   FlaskConical, Compass, Sparkles, ShieldCheck, Globe2, Users,
   Headphones, Briefcase, ArrowRight, CheckCircle2, Calendar, BookOpen, Star, Gift,
+  CreditCard, Lock, ShoppingBag, Loader2, FileText, Check, AlertCircle, X,
 } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -15,6 +16,8 @@ import { api } from "@/lib/api";
 import { Link } from "@tanstack/react-router";
 import { PlayCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "@/contexts/AuthContext";
+import { getLoginUrl } from "@/lib/authSession";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -88,6 +91,17 @@ const fadeUp = {
 
 function Index() {
   const { t } = useTranslation();
+  const { isAuthenticated } = useAuth();
+  const queryClient = useQueryClient();
+
+  const [checkoutProduct, setCheckoutProduct] = useState<any | null>(null);
+  const [isPaying, setIsPaying] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  const [checkoutSuccess, setCheckoutSuccess] = useState(false);
+  const [cardNumber, setCardNumber] = useState('');
+  const [cardHolder, setCardHolder] = useState('');
+  const [cardExpiry, setCardExpiry] = useState('');
+  const [cardCvv, setCardCvv] = useState('');
 
   const { data: dynamicCourses = [], isLoading: isLoadingCourses } = useQuery({
     queryKey: ['landingCourses'],
@@ -96,6 +110,78 @@ function Index() {
       return res.data;
     }
   });
+
+  const { data: digitalProductsData, isLoading: isLoadingProducts } = useQuery({
+    queryKey: ['landingDigitalProducts'],
+    queryFn: async () => {
+      const res = await api.get('/landing/digital-products');
+      return res.data;
+    }
+  });
+  const dynamicProducts = digitalProductsData?.products || [];
+
+  const handleOpenCheckout = (product: any) => {
+    if (!isAuthenticated) {
+      window.location.href = getLoginUrl(window.location.href);
+      return;
+    }
+    if (product.is_free) {
+      handleInstantFreePurchase(product);
+      return;
+    }
+    setCheckoutProduct(product);
+    setCheckoutError(null);
+    setCheckoutSuccess(false);
+    setCardNumber('');
+    setCardHolder('');
+    setCardExpiry('');
+    setCardCvv('');
+  };
+
+  const handleInstantFreePurchase = async (product: any) => {
+    setCheckoutProduct(product);
+    setCheckoutSuccess(false);
+    setIsPaying(true);
+    setCheckoutError(null);
+
+    try {
+      const res = await api.post(`/v1/digital-products/${product.id}/purchase`);
+      queryClient.invalidateQueries({ queryKey: ['landingDigitalProducts'] });
+      setCheckoutSuccess(true);
+      setTimeout(() => {
+        setCheckoutProduct(null);
+        setCheckoutSuccess(false);
+      }, 3000);
+    } catch (err: any) {
+      setCheckoutError(err.response?.data?.message || t('auth.server_error', 'An error occurred. Please try again.'));
+    } finally {
+      setIsPaying(false);
+    }
+  };
+
+  const handleConfirmPurchase = async () => {
+    if (!checkoutProduct) return;
+    if (!cardNumber || !cardHolder || !cardExpiry || !cardCvv) {
+      setCheckoutError(t('validation.required', 'Please fill in all payment details.'));
+      return;
+    }
+    setIsPaying(true);
+    setCheckoutError(null);
+
+    try {
+      const res = await api.post(`/v1/digital-products/${checkoutProduct.id}/purchase`);
+      queryClient.invalidateQueries({ queryKey: ['landingDigitalProducts'] });
+      setCheckoutSuccess(true);
+      setTimeout(() => {
+        setCheckoutProduct(null);
+        setCheckoutSuccess(false);
+      }, 3000);
+    } catch (err: any) {
+      setCheckoutError(err.response?.data?.message || t('auth.server_error', 'An error occurred. Please try again.'));
+    } finally {
+      setIsPaying(false);
+    }
+  };
 
   return (
     <div id="top" className="relative min-h-screen overflow-x-clip bg-background">
@@ -415,6 +501,90 @@ function Index() {
         </div>
       </section>
 
+      {/* DIGITAL PRODUCTS (eBooks & Study Materials) */}
+      <section id="digital-products" className="relative bg-background py-24">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="mb-12 flex flex-wrap items-end justify-between gap-6">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-accent">{t('landing.digital_products.badge')}</p>
+              <h2 className="mt-3 text-4xl font-bold text-primary md:text-5xl">{t('landing.digital_products.title')}</h2>
+            </div>
+            <p className="max-w-md text-muted-foreground">
+              {t('landing.digital_products.desc')}
+            </p>
+          </div>
+
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {isLoadingProducts ? (
+              Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="rounded-2xl border border-border bg-card p-6 shadow-sm animate-pulse">
+                  <div className="h-48 w-full bg-muted rounded-xl mb-4"></div>
+                  <div className="space-y-3">
+                    <div className="h-6 w-2/3 bg-muted rounded"></div>
+                    <div className="h-4 w-full bg-muted rounded"></div>
+                    <div className="h-8 w-1/3 bg-muted rounded"></div>
+                  </div>
+                </div>
+              ))
+            ) : dynamicProducts.length === 0 ? (
+              <div className="col-span-full rounded-2xl border border-dashed border-border p-12 text-center text-muted-foreground bg-card/35">
+                <ShoppingBag className="h-12 w-12 mx-auto mb-3 opacity-20 text-accent" />
+                <p className="font-medium">No digital products available right now.</p>
+              </div>
+            ) : (
+              dynamicProducts.map((p: any, i: number) => (
+                <motion.div
+                  key={p.id}
+                  variants={fadeUp}
+                  custom={i}
+                  initial="hidden"
+                  whileInView="show"
+                  viewport={{ once: true }}
+                  className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-card)] transition hover:-translate-y-1 hover:border-accent"
+                >
+                  <div className="aspect-[16/10] w-full overflow-hidden bg-muted relative">
+                    <img
+                      src={p.thumbnail_path ? `http://localhost:8000/storage/${p.thumbnail_path}` : 'https://placehold.co/600x400/1e293b/ffffff?text=Pharmacy+eBook'}
+                      alt={p.title}
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <div className="absolute top-3 end-3 rounded-full bg-background/90 px-3 py-1 text-xs font-semibold text-accent backdrop-blur-sm">
+                      {p.is_free ? t('free', 'Free') : `$${Number(p.price).toFixed(2)}`}
+                    </div>
+                  </div>
+                  <div className="flex flex-1 flex-col p-6">
+                    <h3 className="text-xl font-bold text-primary mb-2">{p.title}</h3>
+                    <p className="text-sm text-muted-foreground line-clamp-3 mb-6">{p.description}</p>
+                    
+                    <div className="mt-auto pt-4 border-t border-border flex items-center justify-between">
+                      <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                        <FileText className="h-4 w-4 text-accent" /> {p.files_count || 0} {t('landing.digital_products.files')}
+                      </span>
+                      
+                      {p.is_owned ? (
+                        <Link
+                          to="/student/library"
+                          className="inline-flex items-center gap-1.5 rounded-full bg-accent/10 px-4 py-2 text-xs font-bold text-accent transition hover:bg-accent/20"
+                        >
+                          {t('landing.digital_products.go_to_library')}
+                        </Link>
+                      ) : (
+                        <button
+                          onClick={() => handleOpenCheckout(p)}
+                          className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-bold text-primary-foreground transition hover:bg-accent hover:text-accent-foreground cursor-pointer"
+                        >
+                          {t('landing.digital_products.buy_now')}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </motion.div>
+              ))
+            )}
+          </div>
+        </div>
+      </section>
+
       {/* STATS */}
       <section className="relative py-24">
         <div className="mx-auto max-w-7xl px-6">
@@ -589,6 +759,162 @@ function Index() {
       </section>
 
       <Footer />
+
+      {/* MOCK CHECKOUT MODAL */}
+      <AnimatePresence>
+        {checkoutProduct && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => !isPaying && setCheckoutProduct(null)}
+              className="absolute inset-0 bg-background/80 backdrop-blur-sm"
+            />
+
+            {/* Modal Content */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-md overflow-hidden rounded-3xl border border-border bg-card p-6 shadow-2xl z-10"
+            >
+              {/* Close Button */}
+              <button
+                disabled={isPaying}
+                onClick={() => setCheckoutProduct(null)}
+                className="absolute top-4 end-4 p-2 rounded-full hover:bg-secondary text-muted-foreground transition"
+              >
+                <X className="h-4 w-4" />
+              </button>
+
+              {checkoutSuccess ? (
+                <div className="text-center py-8">
+                  <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-green-600 dark:bg-green-900/30">
+                    <Check className="h-8 w-8" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-primary mb-2">{t('auth.success', 'Success!')}</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {t('landing.digital_products.purchase_success')}
+                  </p>
+                </div>
+              ) : (
+                <div>
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/15 text-accent">
+                      <ShoppingBag className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-primary">{t('landing.digital_products.checkout_title')}</h3>
+                      <p className="text-xs text-muted-foreground">{t('landing.digital_products.pay_sim')}</p>
+                    </div>
+                  </div>
+
+                  {checkoutError && (
+                    <div className="mb-4 rounded-xl bg-destructive/10 p-3 text-xs font-semibold text-destructive border border-destructive/20 flex items-center gap-2">
+                      <AlertCircle className="h-4 w-4 shrink-0" />
+                      {checkoutError}
+                    </div>
+                  )}
+
+                  <div className="mb-5 rounded-2xl bg-secondary/50 p-4 border border-border">
+                    <div className="text-xs text-muted-foreground uppercase font-bold tracking-wider mb-1">Product</div>
+                    <div className="font-bold text-primary">{checkoutProduct.title}</div>
+                    <div className="mt-3 flex items-baseline justify-between">
+                      <span className="text-xs text-muted-foreground">Price</span>
+                      <span className="text-xl font-extrabold text-accent">${Number(checkoutProduct.price).toFixed(2)}</span>
+                    </div>
+                  </div>
+
+                  {/* Card Form */}
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-muted-foreground mb-1">
+                        {t('landing.digital_products.card_number')}
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          maxLength={19}
+                          placeholder="4242 4242 4242 4242"
+                          value={cardNumber}
+                          onChange={(e) => setCardNumber(e.target.value.replace(/\s?/g, '').replace(/(\d{4})/g, '$1 ').trim())}
+                          className="w-full rounded-xl border border-border bg-background py-2.5 ps-10 pe-4 text-sm outline-none focus:border-accent"
+                        />
+                        <CreditCard className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-muted-foreground mb-1">
+                        {t('landing.digital_products.cardholder')}
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="John Doe"
+                        value={cardHolder}
+                        onChange={(e) => setCardHolder(e.target.value)}
+                        className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-accent"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-semibold text-muted-foreground mb-1">
+                          {t('landing.digital_products.expiry')}
+                        </label>
+                        <input
+                          type="text"
+                          maxLength={5}
+                          placeholder="MM/YY"
+                          value={cardExpiry}
+                          onChange={(e) => setCardExpiry(e.target.value)}
+                          className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-accent text-center"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-muted-foreground mb-1">
+                          {t('landing.digital_products.cvv')}
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="password"
+                            maxLength={3}
+                            placeholder="•••"
+                            value={cardCvv}
+                            onChange={(e) => setCardCvv(e.target.value.replace(/\D/g, ''))}
+                            className="w-full rounded-xl border border-border bg-background py-2.5 ps-4 pe-10 text-sm outline-none focus:border-accent text-center font-mono"
+                          />
+                          <Lock className="absolute right-3 top-3.5 h-3.5 w-3.5 text-muted-foreground" />
+                        </div>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={handleConfirmPurchase}
+                      disabled={isPaying}
+                      className="w-full mt-6 inline-flex justify-center items-center gap-2 rounded-2xl bg-primary py-3.5 text-sm font-bold text-primary-foreground transition hover:bg-accent hover:text-accent-foreground cursor-pointer shadow-lg shadow-primary/20 disabled:opacity-75"
+                    >
+                      {isPaying ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          {t('landing.digital_products.processing')}
+                        </>
+                      ) : (
+                        <>
+                          <Lock className="h-4 w-4" />
+                          {t('landing.digital_products.pay_confirm')}
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

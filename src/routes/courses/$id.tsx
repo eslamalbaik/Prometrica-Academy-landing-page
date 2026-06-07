@@ -5,8 +5,8 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { BookOpen, PlayCircle, Star, CheckCircle2, AlertCircle, Clock, User as UserIcon } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { BookOpen, PlayCircle, Star, CheckCircle2, AlertCircle, Clock, User as UserIcon, CreditCard, Lock, Loader2, X, ShoppingBag, Check } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { getLoginUrl } from "@/lib/authSession";
 import { pageTitle } from "@/lib/siteMeta";
@@ -27,6 +27,12 @@ function CourseDetails() {
   const [enrollError, setEnrollError] = useState<string | null>(null);
   const [isEnrolling, setIsEnrolling] = useState(false);
   const [enrollSuccess, setEnrollSuccess] = useState(false);
+  const [showCheckout, setShowCheckout] = useState(false);
+  const [isPaying, setIsPaying] = useState(false);
+  const [cardNumber, setCardNumber] = useState('');
+  const [cardHolder, setCardHolder] = useState('');
+  const [cardExpiry, setCardExpiry] = useState('');
+  const [cardCvv, setCardCvv] = useState('');
 
   const { data: course, isLoading, error } = useQuery({
     queryKey: ['course', id],
@@ -68,10 +74,13 @@ function CourseDetails() {
     setEnrollError(null);
 
     try {
-      await api.get('http://localhost:8000/sanctum/csrf-cookie', { baseURL: '' });
       const res = await api.post(`/courses/${id}/enroll`);
       if (res.data.requires_payment) {
-        setEnrollError(res.data.message || t('payment_required', 'Payment required. Checkout flow coming soon.'));
+        setShowCheckout(true);
+        setCardNumber('');
+        setCardHolder('');
+        setCardExpiry('');
+        setCardCvv('');
       } else {
         queryClient.invalidateQueries({ queryKey: ['my-courses'] });
         setEnrollSuccess(true);
@@ -80,6 +89,26 @@ function CourseDetails() {
       setEnrollError(err.response?.data?.message || t('enroll_error', 'An error occurred during enrollment.'));
     } finally {
       setIsEnrolling(false);
+    }
+  };
+
+  const handleConfirmPurchase = async () => {
+    if (!cardNumber || !cardHolder || !cardExpiry || !cardCvv) {
+      setEnrollError(t('validation.required', 'Please fill in all payment details.'));
+      return;
+    }
+    setIsPaying(true);
+    setEnrollError(null);
+
+    try {
+      const res = await api.post(`/courses/${id}/enroll`, { payment_confirmed: true });
+      queryClient.invalidateQueries({ queryKey: ['my-courses'] });
+      setEnrollSuccess(true);
+      setShowCheckout(false);
+    } catch (err: any) {
+      setEnrollError(err.response?.data?.message || t('enroll_error', 'An error occurred during enrollment.'));
+    } finally {
+      setIsPaying(false);
     }
   };
 
@@ -386,6 +415,150 @@ function CourseDetails() {
       </main>
 
       <Footer />
+
+      {/* COURSE CHECKOUT MODAL */}
+      <AnimatePresence>
+        {showCheckout && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => !isPaying && setShowCheckout(false)}
+              className="absolute inset-0 bg-background/80 backdrop-blur-sm"
+            />
+
+            {/* Modal Content */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-md overflow-hidden rounded-3xl border border-border bg-card p-6 shadow-2xl z-10"
+            >
+              {/* Close Button */}
+              <button
+                disabled={isPaying}
+                onClick={() => setShowCheckout(false)}
+                className="absolute top-4 end-4 p-2 rounded-full hover:bg-secondary text-muted-foreground transition"
+              >
+                <X className="h-4 w-4" />
+              </button>
+
+              <div>
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/15 text-accent">
+                    <ShoppingBag className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-primary">{t('landing.digital_products.checkout_title', 'Secure Checkout')}</h3>
+                    <p className="text-xs text-muted-foreground">{t('landing.digital_products.pay_sim', 'Simulated Secure Payment')}</p>
+                  </div>
+                </div>
+
+                {enrollError && (
+                  <div className="mb-4 rounded-xl bg-destructive/10 p-3 text-xs font-semibold text-destructive border border-destructive/20 flex items-center gap-2">
+                    <AlertCircle className="h-4 w-4 shrink-0" />
+                    {enrollError}
+                  </div>
+                )}
+
+                <div className="mb-5 rounded-2xl bg-secondary/50 p-4 border border-border">
+                  <div className="text-xs text-muted-foreground uppercase font-bold tracking-wider mb-1">Course</div>
+                  <div className="font-bold text-primary">{course.title}</div>
+                  <div className="mt-3 flex items-baseline justify-between">
+                    <span className="text-xs text-muted-foreground">Price</span>
+                    <span className="text-xl font-extrabold text-accent">${course.discount_price || course.price}</span>
+                  </div>
+                </div>
+
+                {/* Card Form */}
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-muted-foreground mb-1">
+                      {t('landing.digital_products.card_number', 'Card Number')}
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        maxLength={19}
+                        placeholder="4242 4242 4242 4242"
+                        value={cardNumber}
+                        onChange={(e) => setCardNumber(e.target.value.replace(/\s?/g, '').replace(/(\d{4})/g, '$1 ').trim())}
+                        className="w-full rounded-xl border border-border bg-background py-2.5 ps-10 pe-4 text-sm outline-none focus:border-accent text-foreground"
+                      />
+                      <CreditCard className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-muted-foreground mb-1">
+                      {t('landing.digital_products.cardholder', 'Cardholder Name')}
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="John Doe"
+                      value={cardHolder}
+                      onChange={(e) => setCardHolder(e.target.value)}
+                      className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-accent text-foreground"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-muted-foreground mb-1">
+                        {t('landing.digital_products.expiry', 'MM/YY')}
+                      </label>
+                      <input
+                        type="text"
+                        maxLength={5}
+                        placeholder="MM/YY"
+                        value={cardExpiry}
+                        onChange={(e) => setCardExpiry(e.target.value)}
+                        className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-accent text-center text-foreground"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-muted-foreground mb-1">
+                        {t('landing.digital_products.cvv', 'CVV')}
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="password"
+                          maxLength={3}
+                          placeholder="•••"
+                          value={cardCvv}
+                          onChange={(e) => setCardCvv(e.target.value.replace(/\D/g, ''))}
+                          className="w-full rounded-xl border border-border bg-background py-2.5 ps-4 pe-10 text-sm outline-none focus:border-accent text-center font-mono text-foreground"
+                        />
+                        <Lock className="absolute right-3 top-3.5 h-3.5 w-3.5 text-muted-foreground" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={handleConfirmPurchase}
+                    disabled={isPaying}
+                    className="w-full mt-6 inline-flex justify-center items-center gap-2 rounded-2xl bg-primary py-3.5 text-sm font-bold text-primary-foreground transition hover:bg-accent hover:text-accent-foreground cursor-pointer shadow-lg shadow-primary/20 disabled:opacity-75"
+                  >
+                    {isPaying ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        {t('landing.digital_products.processing', 'Processing...')}
+                      </>
+                    ) : (
+                      <>
+                        <Lock className="h-4 w-4" />
+                        {t('landing.digital_products.pay_confirm', 'Confirm Payment')}
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

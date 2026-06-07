@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
-import { GOOGLE_AUTH_ENABLED, getGoogleAuthUrl } from '@/lib/authSession'
+import { getGoogleAuthUrl } from '@/lib/authSession'
 
 interface GoogleSignInButtonProps {
   returnTo?: string
@@ -37,27 +37,21 @@ export function GoogleSignInButton({ returnTo, mode = 'login' }: GoogleSignInBut
     window.location.href = getGoogleAuthUrl(returnTo)
   }
 
+  const label = mode === 'register'
+    ? t('auth.sign_up_with_google', 'Sign up with Google')
+    : t('auth.continue_with_google', 'Continue with Google')
+
   return (
-    <div className="space-y-2">
-      <Button
-        type="button"
-        variant="outline"
-        size="lg"
-        className="h-11 w-full rounded-xl border-border bg-card text-sm font-semibold shadow-sm hover:bg-secondary/80"
-        onClick={handleClick}
-      >
-        <GoogleIcon />
-        {t('auth.continue_with_google', 'Continue with Google')}
-      </Button>
-      {!GOOGLE_AUTH_ENABLED && (
-        <p className="text-center text-xs text-muted-foreground">
-          {t(
-            'auth.google_setup_hint',
-            'Google sign-in: add GOOGLE_CLIENT_ID & GOOGLE_CLIENT_SECRET on the API server, then set VITE_GOOGLE_AUTH_ENABLED=true.',
-          )}
-        </p>
-      )}
-    </div>
+    <Button
+      type="button"
+      variant="outline"
+      size="lg"
+      className="h-11 w-full rounded-xl border-border bg-card text-sm font-semibold shadow-sm hover:bg-secondary/80"
+      onClick={handleClick}
+    >
+      <GoogleIcon />
+      {label}
+    </Button>
   )
 }
 

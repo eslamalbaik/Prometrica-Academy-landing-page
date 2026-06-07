@@ -10,16 +10,31 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as StudentRouteImport } from './routes/student'
+import { Route as StoreRouteImport } from './routes/store'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as StudentLibraryRouteImport } from './routes/student/library'
 import { Route as StudentDashboardRouteImport } from './routes/student/dashboard'
 import { Route as CoursesIdRouteImport } from './routes/courses/$id'
 import { Route as StudentLearnIdRouteImport } from './routes/student/learn/$id'
+import { Route as AuthGoogleCallbackRouteImport } from './routes/auth/google/callback'
 
 const StudentRoute = StudentRouteImport.update({
   id: '/student',
   path: '/student',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StoreRoute = StoreRouteImport.update({
+  id: '/store',
+  path: '/store',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RegisterRoute = RegisterRouteImport.update({
@@ -32,10 +47,20 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const StudentLibraryRoute = StudentLibraryRouteImport.update({
+  id: '/library',
+  path: '/library',
+  getParentRoute: () => StudentRoute,
 } as any)
 const StudentDashboardRoute = StudentDashboardRouteImport.update({
   id: '/dashboard',
@@ -52,71 +77,110 @@ const StudentLearnIdRoute = StudentLearnIdRouteImport.update({
   path: '/learn/$id',
   getParentRoute: () => StudentRoute,
 } as any)
+const AuthGoogleCallbackRoute = AuthGoogleCallbackRouteImport.update({
+  id: '/auth/google/callback',
+  path: '/auth/google/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/store': typeof StoreRoute
   '/student': typeof StudentRouteWithChildren
   '/courses/$id': typeof CoursesIdRoute
   '/student/dashboard': typeof StudentDashboardRoute
+  '/student/library': typeof StudentLibraryRoute
+  '/auth/google/callback': typeof AuthGoogleCallbackRoute
   '/student/learn/$id': typeof StudentLearnIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/store': typeof StoreRoute
   '/student': typeof StudentRouteWithChildren
   '/courses/$id': typeof CoursesIdRoute
   '/student/dashboard': typeof StudentDashboardRoute
+  '/student/library': typeof StudentLibraryRoute
+  '/auth/google/callback': typeof AuthGoogleCallbackRoute
   '/student/learn/$id': typeof StudentLearnIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/store': typeof StoreRoute
   '/student': typeof StudentRouteWithChildren
   '/courses/$id': typeof CoursesIdRoute
   '/student/dashboard': typeof StudentDashboardRoute
+  '/student/library': typeof StudentLibraryRoute
+  '/auth/google/callback': typeof AuthGoogleCallbackRoute
   '/student/learn/$id': typeof StudentLearnIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/forgot-password'
     | '/login'
     | '/register'
+    | '/reset-password'
+    | '/store'
     | '/student'
     | '/courses/$id'
     | '/student/dashboard'
+    | '/student/library'
+    | '/auth/google/callback'
     | '/student/learn/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/forgot-password'
     | '/login'
     | '/register'
+    | '/reset-password'
+    | '/store'
     | '/student'
     | '/courses/$id'
     | '/student/dashboard'
+    | '/student/library'
+    | '/auth/google/callback'
     | '/student/learn/$id'
   id:
     | '__root__'
     | '/'
+    | '/forgot-password'
     | '/login'
     | '/register'
+    | '/reset-password'
+    | '/store'
     | '/student'
     | '/courses/$id'
     | '/student/dashboard'
+    | '/student/library'
+    | '/auth/google/callback'
     | '/student/learn/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
+  StoreRoute: typeof StoreRoute
   StudentRoute: typeof StudentRouteWithChildren
   CoursesIdRoute: typeof CoursesIdRoute
+  AuthGoogleCallbackRoute: typeof AuthGoogleCallbackRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -126,6 +190,20 @@ declare module '@tanstack/react-router' {
       path: '/student'
       fullPath: '/student'
       preLoaderRoute: typeof StudentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/store': {
+      id: '/store'
+      path: '/store'
+      fullPath: '/store'
+      preLoaderRoute: typeof StoreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/register': {
@@ -142,12 +220,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/student/library': {
+      id: '/student/library'
+      path: '/library'
+      fullPath: '/student/library'
+      preLoaderRoute: typeof StudentLibraryRouteImport
+      parentRoute: typeof StudentRoute
     }
     '/student/dashboard': {
       id: '/student/dashboard'
@@ -170,16 +262,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StudentLearnIdRouteImport
       parentRoute: typeof StudentRoute
     }
+    '/auth/google/callback': {
+      id: '/auth/google/callback'
+      path: '/auth/google/callback'
+      fullPath: '/auth/google/callback'
+      preLoaderRoute: typeof AuthGoogleCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 interface StudentRouteChildren {
   StudentDashboardRoute: typeof StudentDashboardRoute
+  StudentLibraryRoute: typeof StudentLibraryRoute
   StudentLearnIdRoute: typeof StudentLearnIdRoute
 }
 
 const StudentRouteChildren: StudentRouteChildren = {
   StudentDashboardRoute: StudentDashboardRoute,
+  StudentLibraryRoute: StudentLibraryRoute,
   StudentLearnIdRoute: StudentLearnIdRoute,
 }
 
@@ -188,10 +289,14 @@ const StudentRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
+  StoreRoute: StoreRoute,
   StudentRoute: StudentRouteWithChildren,
   CoursesIdRoute: CoursesIdRoute,
+  AuthGoogleCallbackRoute: AuthGoogleCallbackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

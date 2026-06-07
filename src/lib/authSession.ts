@@ -8,6 +8,7 @@ const LANDING_ORIGIN = (import.meta.env.VITE_LANDING_URL || 'http://localhost:80
 export const FRONTEND_URL = (import.meta.env.VITE_FRONTEND_URL || 'http://localhost:5173').replace(/\/$/, '')
 
 export const GOOGLE_AUTH_ENABLED = import.meta.env.VITE_GOOGLE_AUTH_ENABLED === 'true'
+export const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || ''
 
 export function clearStoredAuth() {
   if (typeof localStorage === 'undefined')

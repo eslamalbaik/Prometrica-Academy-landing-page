@@ -1,10 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useAuth } from "@/contexts/AuthContext";
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
+
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 import { 
   User, 
   BookOpen, 
@@ -19,7 +22,11 @@ import {
   Eye,
   EyeOff,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Clock,
+  FileText,
+  Camera,
+  Loader2
 } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -123,7 +130,6 @@ function AccountTab({ user }: { user: any }) {
 
   const mutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      await api.get('http://localhost:8000/sanctum/csrf-cookie', { baseURL: '' });
       return api.put('/student/profile', data);
     },
     onSuccess: (res) => {
@@ -256,7 +262,6 @@ function PasswordTab() {
 
   const mutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      await api.get('http://localhost:8000/sanctum/csrf-cookie', { baseURL: '' });
       return api.put('/student/password', data);
     },
     onSuccess: (res) => {
@@ -416,7 +421,7 @@ function CourseCard({ course, t }: { course: any, t: any }) {
     >
       <div className="aspect-video w-full overflow-hidden bg-gray-100">
         <img 
-          src={course.thumbnail ? `http://localhost:8000/storage/${course.thumbnail}` : 'https://placehold.co/600x400/f8fafc/94a3b8?text=Course'} 
+          src={course.thumbnail ? `${API_BASE}/storage/${course.thumbnail}` : 'https://placehold.co/600x400/f8fafc/94a3b8?text=Course'}
           alt={course.title} 
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
@@ -446,52 +451,344 @@ function CourseCard({ course, t }: { course: any, t: any }) {
   );
 }
 
+interface Subscription {
+  type: 'course' | 'product';
+  id: number;
+  title: string;
+  thumbnail: string | null;
+  progress: number | null;
+  started_at: string | null;
+  expires_at: string | null;
+  is_lifetime: boolean;
+  is_active: boolean;
+  days_remaining: number | null;
+}
+
 function SubscriptionsTab() {
   const { t } = useTranslation();
+
+  const { data: subs = [], isLoading, isError } = useQuery({
+    queryKey: ['my-subscriptions'],
+    queryFn: async () => {
+      const res = await api.get('/v1/my-subscriptions');
+      return (res.data?.subscriptions ?? []) as Subscription[];
+    },
+  });
+
+  const fmtDate = (iso: string | null) =>
+    iso ? new Date(iso).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : '—';
+
   return (
     <div>
       <h2 className="text-xl font-bold text-slate-900 mb-6">{t('tab_subscriptions', 'Subscriptions')}</h2>
-      <EmptyState message={t('no_courses_watched', "You haven't watched any courses yet.")} icon={<PlayCircle className="h-10 w-10 text-gray-300" />} />
+
+      {isLoading ? (
+        <div className="flex justify-center py-16"><PlayCircle className="h-8 w-8 animate-pulse text-gray-300" /></div>
+      ) : isError ? (
+        <EmptyState message={t('subs_load_error', 'Could not load your subscriptions.')} icon={<AlertCircle className="h-10 w-10 text-gray-300" />} />
+      ) : subs.length === 0 ? (
+        <EmptyState message={t('no_subscriptions', 'You have no active subscriptions yet.')} icon={<PlayCircle className="h-10 w-10 text-gray-300" />} />
+      ) : (
+        <div className="space-y-3">
+          {subs.map((s, i) => {
+            const expiringSoon = s.is_active && s.days_remaining !== null && s.days_remaining <= 7;
+            return (
+              <div
+                key={`${s.type}-${s.id}-${i}`}
+                className={`flex items-center gap-4 rounded-2xl border bg-white p-4 ${
+                  s.is_active ? 'border-gray-100' : 'border-red-100 bg-red-50/40'
+                }`}
+              >
+                {/* Thumbnail */}
+                <div className="h-14 w-20 shrink-0 overflow-hidden rounded-lg bg-gray-100">
+                  {s.thumbnail ? (
+                    <img src={`${API_BASE}/storage/${s.thumbnail}`} alt={s.title} className="h-full w-full object-cover" />
+                  ) : (
+                    <div className="flex h-full items-center justify-center">
+                      {s.type === 'course'
+                        ? <BookOpen className="h-6 w-6 text-gray-300" />
+                        : <FileText className="h-6 w-6 text-gray-300" />}
+                    </div>
+                  )}
+                </div>
+
+                {/* Info */}
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="rounded-md bg-gray-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-gray-500">
+                      {s.type === 'course' ? t('subs_course', 'Course') : t('subs_product', 'File')}
+                    </span>
+                    <h3 className="truncate font-semibold text-slate-900">{s.title}</h3>
+                  </div>
+                  <div className="mt-1 flex items-center gap-1.5 text-xs text-gray-500">
+                    <Clock className="h-3.5 w-3.5" />
+                    {s.is_lifetime ? (
+                      <span>{t('subs_lifetime', 'Lifetime access')}</span>
+                    ) : (
+                      <span>
+                        {t('subs_expires', 'Expires')}: {fmtDate(s.expires_at)}
+                        {s.is_active && s.days_remaining !== null && (
+                          <> · {s.days_remaining} {t('subs_days_left', 'days left')}</>
+                        )}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Status badge */}
+                <div className="shrink-0">
+                  {s.is_active ? (
+                    <span className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold ${
+                      expiringSoon ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'
+                    }`}>
+                      <CheckCircle2 className="h-3.5 w-3.5" />
+                      {expiringSoon ? t('subs_expiring', 'Expiring soon') : t('subs_active', 'Active')}
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-3 py-1 text-xs font-bold text-red-700">
+                      <AlertCircle className="h-3.5 w-3.5" />
+                      {t('subs_expired', 'Expired')}
+                    </span>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
 
 function CertificatesTab() {
   const { t } = useTranslation();
+  const [verifying, setVerifying] = useState<string | null>(null);
+  const [verifyResult, setVerifyResult] = useState<any>(null);
+  const [verifyError, setVerifyError] = useState('');
+
+  const { data: certificates = [], isLoading, isError } = useQuery({
+    queryKey: ['student-certificates'],
+    queryFn: async () => {
+      const res = await api.get('/student/certificates');
+      return res.data;
+    },
+  });
+
+  const handleVerify = async (uuid: string) => {
+    setVerifying(uuid);
+    setVerifyResult(null);
+    setVerifyError('');
+    try {
+      const res = await api.get(`/certificates/${uuid}/verify`);
+      setVerifyResult(res.data);
+    } catch {
+      setVerifyError(t('certificate_invalid', 'Could not verify this certificate.'));
+    } finally {
+      setVerifying(null);
+    }
+  };
+
   return (
     <div>
       <h2 className="text-xl font-bold text-slate-900 mb-6">{t('tab_certificates', 'Certificates')}</h2>
-      <div className="flex flex-col items-center justify-center py-16 text-center">
-        <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-gray-50 border border-gray-100">
-          <Award className="h-10 w-10 text-gray-300" />
+
+      {isLoading ? (
+        <div className="flex justify-center py-12">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-emerald-500 border-t-transparent" />
         </div>
-        <h3 className="mb-2 text-lg font-bold text-slate-900">{t('no_certificates_yet', 'No certificates yet')}</h3>
-        <p className="text-sm text-gray-500 hover:text-emerald-500 cursor-pointer transition-colors">
-          {t('click_here_for_help', 'Click here for help')}
-        </p>
-      </div>
+      ) : isError ? (
+        <div className="rounded-lg bg-red-50 p-4 text-red-600 border border-red-200">
+          {t('failed_to_load', 'Failed to load certificates.')}
+        </div>
+      ) : certificates.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-gray-50 border border-gray-100">
+            <Award className="h-10 w-10 text-gray-300" />
+          </div>
+          <h3 className="mb-2 text-lg font-bold text-slate-900">{t('no_certificates_yet', 'No certificates yet')}</h3>
+          <p className="text-sm text-gray-500">{t('complete_course_to_earn', 'Complete a course 100% to earn your certificate.')}</p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {verifyResult && (
+            <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 flex items-start gap-3">
+              <CheckCircle2 className="h-5 w-5 text-emerald-500 mt-0.5 shrink-0" />
+              <div className="text-sm">
+                <p className="font-bold text-emerald-800 mb-1">{t('valid_certificate', 'Valid Certificate')}</p>
+                <p className="text-emerald-700">{t('student', 'Student')}: <strong>{verifyResult.student}</strong></p>
+                <p className="text-emerald-700">{t('course', 'Course')}: <strong>{verifyResult.course}</strong></p>
+                <p className="text-emerald-700">{t('issued', 'Issued')}: <strong>{verifyResult.issued_at}</strong></p>
+              </div>
+              <button onClick={() => setVerifyResult(null)} className="ms-auto text-emerald-400 hover:text-emerald-600">✕</button>
+            </div>
+          )}
+
+          {verifyError && (
+            <div className="rounded-xl border border-red-200 bg-red-50 p-4 flex items-center gap-3 text-sm text-red-700">
+              <AlertCircle className="h-5 w-5 shrink-0" />
+              {verifyError}
+              <button onClick={() => setVerifyError('')} className="ms-auto text-red-400 hover:text-red-600">✕</button>
+            </div>
+          )}
+
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {certificates.map((cert: any) => (
+              <div key={cert.id} className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm flex flex-col gap-3">
+                {/* Course thumbnail */}
+                <div className="flex items-center gap-3">
+                  <div className="h-12 w-12 rounded-xl overflow-hidden bg-gray-100 shrink-0">
+                    {cert.course?.thumbnail ? (
+                      <img
+                        src={`${API_BASE}/storage/${cert.course.thumbnail}`}
+                        alt={cert.course?.title}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <div className="h-full w-full flex items-center justify-center">
+                        <Award className="h-6 w-6 text-gray-300" />
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <p className="font-bold text-slate-900 text-sm line-clamp-2">{cert.course?.title}</p>
+                    {cert.course?.category && (
+                      <span className="inline-block mt-0.5 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700">
+                        {cert.course.category}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Badge */}
+                <div className="flex items-center gap-2 rounded-xl bg-emerald-50 border border-emerald-100 px-3 py-2">
+                  <Award className="h-5 w-5 text-emerald-500 shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-semibold text-emerald-800">{t('certificate_of_completion', 'Certificate of Completion')}</p>
+                    <p className="text-xs text-emerald-600 truncate">
+                      {t('issued', 'Issued')}: {new Date(cert.issued_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+
+                {/* UUID */}
+                <p className="text-xs text-gray-400 font-mono truncate">{cert.uuid}</p>
+
+                {/* Action buttons */}
+                <div className="flex gap-2">
+                  {/* Download PDF */}
+                  <a
+                    href={`${API_BASE}/api/certificates/${cert.uuid}/download`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 flex items-center justify-center gap-1.5 rounded-lg bg-primary py-2 text-xs font-bold text-white hover:bg-primary/90 transition-colors"
+                  >
+                    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" />
+                    </svg>
+                    {t('download_pdf', 'Download PDF')}
+                  </a>
+
+                  {/* Verify */}
+                  <button
+                    disabled={verifying === cert.uuid}
+                    onClick={() => handleVerify(cert.uuid)}
+                    className="flex-1 rounded-lg border border-emerald-200 bg-emerald-50 py-2 text-xs font-bold text-emerald-700 hover:bg-emerald-100 transition-colors disabled:opacity-60"
+                  >
+                    {verifying === cert.uuid
+                      ? t('verifying', 'Verifying…')
+                      : t('verify_certificate', 'Verify')}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
 function ProfileTab({ user }: { user: any }) {
   const { t } = useTranslation();
+  const { updateUser } = useAuth();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  // Instant local preview while the upload is in flight.
+  const [preview, setPreview] = useState<string | null>(null);
+
+  const avatarSrc = preview
+    ? preview
+    : user?.avatar
+      ? `${API_BASE}/storage/${user.avatar}`
+      : `https://placehold.co/200x200/0f172a/ffffff?text=${encodeURIComponent(user?.name?.[0] ?? "U")}`;
+
+  const onPick = () => fileInputRef.current?.click();
+
+  const onFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setError(null);
+    setPreview(URL.createObjectURL(file));
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append("avatar", file);
+      const res = await api.post("/v1/profile/avatar", fd, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      // Sync auth context so navbar + dashboard reflect the new picture.
+      if (res.data?.user) updateUser(res.data.user);
+      toast.success(t("avatar_updated", "Profile picture updated."));
+    } catch {
+      setError(t("avatar_failed", "Could not upload the image. Use JPG/PNG up to 4MB."));
+      setPreview(null);
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
   return (
     <div>
       <h2 className="text-xl font-bold text-slate-900 mb-6">{t('tab_profile', 'Profile')}</h2>
       <div className="max-w-2xl rounded-2xl border border-gray-200 bg-gray-50 p-6 flex items-start gap-6">
-         <img 
-            src={user?.avatar ? `http://localhost:8000/storage/${user.avatar}` : `https://placehold.co/200x200/0f172a/ffffff?text=${encodeURIComponent(user?.name?.[0] ?? "U")}`}
+        <div className="relative shrink-0">
+          <img
+            src={avatarSrc}
             alt={user?.name}
-            className="h-20 w-20 rounded-xl object-cover border border-gray-200 shadow-sm"
+            className="h-24 w-24 rounded-xl object-cover border border-gray-200 shadow-sm"
           />
-          <div>
-            <h3 className="text-lg font-bold text-slate-900">{user?.name}</h3>
-            <p className="text-sm text-gray-500 mb-4">{user?.email}</p>
-            <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700 capitalize">
-              {user?.role}
-            </div>
+          {/* Camera button overlay */}
+          <button
+            type="button"
+            onClick={onPick}
+            disabled={uploading}
+            className="absolute -bottom-2 -end-2 flex h-9 w-9 items-center justify-center rounded-full bg-primary text-white shadow-md ring-2 ring-white hover:bg-primary/90 disabled:opacity-60"
+            aria-label={t("change_photo", "Change photo")}
+          >
+            {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/png,image/jpeg,image/jpg,image/webp"
+            className="hidden"
+            onChange={onFile}
+          />
+        </div>
+
+        <div>
+          <h3 className="text-lg font-bold text-slate-900">{user?.name}</h3>
+          <p className="text-sm text-gray-500 mb-3">{user?.email}</p>
+          <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700 capitalize">
+            {user?.role}
           </div>
+          <p className="mt-3 text-xs text-gray-400">
+            {t("avatar_hint", "Click the camera icon to upload a new photo (JPG/PNG, max 4MB).")}
+          </p>
+          {error && <p className="mt-2 text-xs text-red-500">{error}</p>}
+        </div>
       </div>
     </div>
   );
