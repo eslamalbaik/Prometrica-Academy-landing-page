@@ -129,6 +129,10 @@
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
 }
+@keyframes marquee-reverse {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
+}
 
 .animate-float-y { animation: float-y 6s ease-in-out infinite; }
 .animate-float-rot { animation: float-rot 7s ease-in-out infinite; }

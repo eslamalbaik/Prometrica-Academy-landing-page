@@ -4,9 +4,10 @@ import { api } from "@/lib/api";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCart } from "@/contexts/CartContext";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { BookOpen, PlayCircle, Star, CheckCircle2, AlertCircle, Clock, User as UserIcon, CreditCard, Lock, Loader2, X, ShoppingBag, Check } from "lucide-react";
+import { BookOpen, PlayCircle, Star, CheckCircle2, AlertCircle, Clock, User as UserIcon, CreditCard, Lock, Loader2, X, ShoppingBag, Check, ShoppingCart } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { getLoginUrl } from "@/lib/authSession";
 import { pageTitle } from "@/lib/siteMeta";
@@ -21,6 +22,7 @@ export const Route = createFileRoute("/courses/$id")({
 function CourseDetails() {
   const { id } = Route.useParams();
   const { isAuthenticated, user } = useAuth();
+  const { addToCart, isInCart } = useCart();
   const queryClient = useQueryClient();
   const { t } = useTranslation();
   
@@ -379,20 +381,40 @@ function CourseDetails() {
                   {t('open_course', 'Open Course')}
                 </a>
               ) : enrollSuccess || course.is_enrolled ? (
-                <Link 
+                <Link
                   to="/student/learn/$id"
                   params={{ id: String(course.id) }}
                   className="w-full inline-flex justify-center items-center gap-2 rounded-2xl bg-green-600 px-6 py-4 text-base font-bold text-white transition-all hover:bg-green-700 shadow-lg shadow-green-600/20 hover:-translate-y-0.5"
                 >
                   <CheckCircle2 className="h-5 w-5" /> {t('go_to_course', 'Go to Course')}
                 </Link>
-              ) : (
-                <button 
+              ) : course.is_free ? (
+                <button
                   onClick={handleEnroll}
                   disabled={isEnrolling}
                   className="w-full inline-flex justify-center items-center gap-2 rounded-2xl bg-primary px-6 py-4 text-base font-bold text-primary-foreground transition-all hover:bg-primary/90 shadow-lg shadow-primary/25 disabled:opacity-70 disabled:cursor-not-allowed hover:-translate-y-0.5"
                 >
                   {isEnrolling ? t('enrolling', 'Enrolling...') : t('enroll_now', 'Enroll Now')}
+                </button>
+              ) : isInCart(course.id, 'course') ? (
+                <Link
+                  to="/cart"
+                  className="w-full inline-flex justify-center items-center gap-2 rounded-2xl bg-emerald-600 px-6 py-4 text-base font-bold text-white transition-all hover:bg-emerald-700 shadow-lg shadow-emerald-600/20 hover:-translate-y-0.5"
+                >
+                  <CheckCircle2 className="h-5 w-5" /> {t('cart.in_cart', 'In Cart')} — {t('cart.view_cart', 'View Cart')}
+                </Link>
+              ) : (
+                <button
+                  onClick={() => addToCart({
+                    id: course.id,
+                    type: 'course',
+                    title: course.title,
+                    price: course.discount_price || course.price || 0,
+                    thumbnail: course.thumbnail ? `http://localhost:8000/storage/${course.thumbnail}` : null,
+                  })}
+                  className="w-full inline-flex justify-center items-center gap-2 rounded-2xl bg-primary px-6 py-4 text-base font-bold text-primary-foreground transition-all hover:bg-primary/90 shadow-lg shadow-primary/25 hover:-translate-y-0.5"
+                >
+                  <ShoppingCart className="h-5 w-5" /> {t('cart.add_to_cart', 'Add to Cart')}
                 </button>
               )}
 

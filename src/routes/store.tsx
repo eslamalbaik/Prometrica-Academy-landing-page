@@ -78,9 +78,6 @@ function StorePage() {
       <div className="mx-auto w-full max-w-6xl flex-1 px-4 pb-16 pt-28">
         {/* Header */}
         <div className="mb-10 text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
-            <ShoppingBag className="h-7 w-7 text-primary" />
-          </div>
           <h1 className="text-3xl font-bold text-gray-900">
             {t("store.title", "Digital Store")}
           </h1>

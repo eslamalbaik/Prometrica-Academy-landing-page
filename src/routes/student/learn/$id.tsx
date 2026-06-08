@@ -431,7 +431,11 @@ function CoursePlayer() {
                 <div>
                   <h2 className="text-2xl font-bold text-foreground mb-2 leading-tight">{activeLesson.title}</h2>
                   <div className="flex flex-wrap items-center gap-3 text-xs font-medium text-muted-foreground">
-                    <span className="flex items-center gap-1.5 bg-secondary/70 px-2.5 py-1 rounded-full text-foreground"><PlayCircle className="h-3.5 w-3.5 text-primary" /> {activeLesson.duration_minutes || 0} min</span>
+                    {activeLesson.duration_minutes > 0 && (
+                      <span className="flex items-center gap-1.5 bg-secondary/70 px-2.5 py-1 rounded-full text-foreground">
+                        <PlayCircle className="h-3.5 w-3.5 text-primary" /> {activeLesson.duration_minutes} min
+                      </span>
+                    )}
                     <span className="flex items-center gap-1.5 bg-secondary/70 px-2.5 py-1 rounded-full text-foreground"><BookOpen className="h-3.5 w-3.5 text-primary" /> {t('lesson')} {activeLesson.id}</span>
                   </div>
                 </div>
@@ -774,7 +778,9 @@ function CoursePlayer() {
                                     </h4>
                                     <div className="mt-1 flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
                                       {item.item_type === 'lesson' ? (
-                                        <><Clock className="h-3 w-3" /> {item.duration_minutes || 0}m</>
+                                        item.duration_minutes > 0 ? (
+                                          <><Clock className="h-3 w-3" /> {item.duration_minutes}m</>
+                                        ) : null
                                       ) : isLocked ? (
                                         <><Lock className="h-3 w-3" /> {t('quiz_locked', 'Quiz • Locked')}</>
                                       ) : (

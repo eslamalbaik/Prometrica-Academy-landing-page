@@ -10,6 +10,8 @@ import {
 } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { PricingPlans } from "@/components/landing/PricingPlans";
+import { FaqSection } from "@/components/landing/FaqSection";
 import { HeroVisual } from "@/components/HeroVisual";
 import { Counter } from "@/components/Counter";
 import { api } from "@/lib/api";
@@ -17,6 +19,7 @@ import { Link } from "@tanstack/react-router";
 import { PlayCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCart } from "@/contexts/CartContext";
 import { getLoginUrl } from "@/lib/authSession";
 
 export const Route = createFileRoute("/")({
@@ -84,6 +87,23 @@ const testimonials = [
   { q: "Finally, an educational partner that focuses on deep understanding and confidence — not rote memorization.", a: "Dr. Sara M.", r: "Hospital Pharmacist" },
 ];
 
+const allStudentReviews = [
+  // Row 1
+  { q: 'اسامة التميمي عم الجميع', a: 'خالد جودت', r: 'طالب صيدلة', rating: 4, color: '#1e4b8f' },
+  { q: 'كل الاحترام للمعلمين', a: 'ماجد أخمد', r: 'طالب صيدلة', rating: 5, color: '#0e7a6e' },
+  { q: 'الله يجزيكم الخير', a: 'ياسمين ابراهيم', r: 'صيدلانية', rating: 4, color: '#8b4513' },
+  { q: 'غيرت أكاديمية بروميتريكا طريقة دراستي تماماً، واجتزت امتحان الترخيص من المحاولة الأولى.', a: 'ليلى هـ.', r: 'صيدلانية مرخصة', rating: 5, color: '#6b21a8' },
+  { q: 'كان مستوى الاحترافية وأسئلة التدريب استثنائياً وواقعياً.', a: 'عمر س.', r: 'صيدلاني سريري', rating: 5, color: '#0f5132' },
+  { q: 'أخيراً، شريك تعليمي يركز على الفهم العميق والثقة — وليس الحفظ عن ظهر قلب.', a: 'د. سارة م.', r: 'صيدلانية مستشفى', rating: 5, color: '#92400e' },
+  // Row 2
+  { q: 'منصة جدا جميلة وشرح ممتاز', a: 'NASR Alsayed', r: 'Pharmacist', rating: 5, color: '#1e3a5f' },
+  { q: 'يعطيكم العافية لكل الاساتذه واتمنا التوفيق والنجاح الي وللجميع', a: 'سيف الدين ايمن براسنه', r: 'طالب صيدلة', rating: 5, color: '#065f46' },
+  { q: 'ماشاء على الاستاذ احمد الحطبه افضل مدرس وسريع الفهم منه', a: 'هيا القضاه', r: 'صيدلانية', rating: 5, color: '#7c2d12' },
+  { q: 'برنامج الإعداد أعطاني الثقة الكاملة قبل الاختبار، ونجحت بامتياز.', a: 'أحمد م.', r: 'صيدلاني مرخص', rating: 5, color: '#1e4b8f' },
+  { q: 'المحتوى منظم ومركّز — لا وقت ضائع، كل ثانية لها قيمة.', a: 'نور ع.', r: 'صيدلانية', rating: 5, color: '#5b21b6' },
+  { q: 'تجربة تعلم احترافية من أول يوم حتى آخر يوم — أنصح بها كل صيدلاني.', a: 'فيصل ر.', r: 'صيدلاني سريري', rating: 5, color: '#0e7a6e' },
+];
+
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
   show: (i = 0) => ({ opacity: 1, y: 0, transition: { delay: i * 0.06, duration: 0.6, ease: [0.22, 1, 0.36, 1] as const } }),
@@ -92,6 +112,7 @@ const fadeUp = {
 function Index() {
   const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
+  const { addToCart, isInCart } = useCart();
   const queryClient = useQueryClient();
 
   const [checkoutProduct, setCheckoutProduct] = useState<any | null>(null);
@@ -479,12 +500,35 @@ function Index() {
                           <span className="flex items-center gap-1"><BookOpen className="h-4 w-4" /> {c.lessons_count || 0} {t('landing.courses.lessons')}</span>
                           <span className="flex items-center gap-1"><PlayCircle className="h-4 w-4" /> {c.total_duration || 0}m</span>
                         </div>
-                        <Link 
-                          to="/courses/$id"
-                          params={{ id: String(c.id) }}
-                          className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary transition hover:text-accent cursor-pointer">
-                          {t('landing.courses.viewCourse')} <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
-                        </Link>
+                        {c.is_free ? (
+                          <Link
+                            to="/courses/$id"
+                            params={{ id: String(c.id) }}
+                            className="inline-flex items-center gap-1.5 rounded-xl bg-accent/10 px-4 py-2 text-sm font-semibold text-accent hover:bg-accent hover:text-white transition-colors"
+                          >
+                            {t('free', 'Free')} <ArrowRight className="h-4 w-4" />
+                          </Link>
+                        ) : isInCart(c.id, 'course') ? (
+                          <Link
+                            to="/cart"
+                            className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-500 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-600 transition-colors"
+                          >
+                            <Check className="h-4 w-4" /> {t('cart.in_cart', 'In Cart')}
+                          </Link>
+                        ) : (
+                          <button
+                            onClick={() => addToCart({
+                              id: c.id,
+                              type: 'course',
+                              title: c.title,
+                              price: Number(c.discount_price || c.price || 0),
+                              thumbnail: c.thumbnail ? `http://localhost:8000/storage/${c.thumbnail}` : null,
+                            })}
+                            className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary/90 transition-colors"
+                          >
+                            <ShoppingBag className="h-4 w-4" /> {t('landing.courses.viewCourse')}
+                          </button>
+                        )}
                       </div>
                     </div>
                   </motion.div>
@@ -585,6 +629,12 @@ function Index() {
         </div>
       </section>
 
+      {/* PRICING PLANS */}
+      <PricingPlans />
+
+      {/* FAQ */}
+      <FaqSection limit={6} />
+
       {/* STATS */}
       <section className="relative py-24">
         <div className="mx-auto max-w-7xl px-6">
@@ -650,84 +700,66 @@ function Index() {
         </div>
       </section>
 
-      {/* PROCESS */}
-      <section id="process" className="relative bg-secondary/50 py-24">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="mb-14 max-w-2xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-accent">{t('landing.process.badge')}</p>
-            <h2 className="mt-3 text-4xl font-bold text-primary md:text-5xl">
-              {t('landing.process.title1')}<span className="text-gradient">{t('landing.process.title2')}</span>
-            </h2>
-          </div>
-          <div className="relative">
-            <div className="absolute left-1/2 top-0 hidden h-full w-px bg-gradient-to-b from-accent via-accent/60 to-transparent md:block" />
-            <div className="space-y-6">
-              {[
-                { n: "01", ...t('landing.process.s1', { returnObjects: true }) as any },
-                { n: "02", ...t('landing.process.s2', { returnObjects: true }) as any },
-                { n: "03", ...t('landing.process.s3', { returnObjects: true }) as any },
-                { n: "04", ...t('landing.process.s4', { returnObjects: true }) as any },
-                { n: "05", ...t('landing.process.s5', { returnObjects: true }) as any }
-              ].map((s, i) => (
-                <motion.div
-                  key={s.n}
-                  initial={{ opacity: 0, x: i % 2 === 0 ? -30 : 30 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  className={`flex flex-col gap-4 md:flex-row md:items-center ${i % 2 === 1 ? "md:flex-row-reverse" : ""}`}
-                >
-                  <div className="md:w-1/2">
-                    <div className={`rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-card)] ${i % 2 === 1 ? "md:ml-auto" : ""} max-w-md`}>
-                      <div className="text-xs font-bold uppercase tracking-wider text-accent">{t('landing.process.step')} {s.n}</div>
-                      <h3 className="mt-1 text-xl font-semibold text-primary">{s.title}</h3>
-                      <p className="mt-2 text-sm text-muted-foreground">{s.text}</p>
-                    </div>
-                  </div>
-                  <div className="relative hidden h-5 w-5 shrink-0 items-center justify-center md:flex">
-                    <div className="h-3 w-3 rounded-full bg-accent shadow-[0_0_0_6px_oklch(0.78_0.16_175/0.2)]" />
-                  </div>
-                  <div className="md:w-1/2" />
-                </motion.div>
+      {/* TESTIMONIALS */}
+      <section className="relative overflow-hidden py-28" style={{ background: 'oklch(0.19 0.055 250)' }}>
+        {/* Grid overlay */}
+        <div className="pointer-events-none absolute inset-0" style={{
+          backgroundImage: 'linear-gradient(oklch(1 0 0/0.025) 1px,transparent 1px),linear-gradient(90deg,oklch(1 0 0/0.025) 1px,transparent 1px)',
+          backgroundSize: '48px 48px'
+        }} />
+        {/* Glow blobs */}
+        <div className="pointer-events-none absolute -top-40 left-1/3 h-[500px] w-[500px] rounded-full blur-[140px]" style={{ background: 'oklch(0.78 0.16 175/0.14)' }} />
+        <div className="pointer-events-none absolute -bottom-40 right-1/3 h-[500px] w-[500px] rounded-full blur-[140px]" style={{ background: 'oklch(0.78 0.16 55/0.1)' }} />
+
+        {/* Header */}
+        <div className="relative mx-auto max-w-4xl px-6 text-center">
+          <motion.p variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }}
+            className="text-xs font-semibold uppercase tracking-[0.22em] text-accent">
+            {t('landing.testimonials.badge')}
+          </motion.p>
+          <motion.h2 variants={fadeUp} custom={1} initial="hidden" whileInView="show" viewport={{ once: true }}
+            className="mt-3 text-4xl font-bold text-white md:text-5xl">
+            {t('landing.testimonials.title_pre', 'ما يقوله')}{' '}
+            <span className="text-gradient">{t('landing.testimonials.title_hl', 'طلابنا')}</span>
+          </motion.h2>
+          <motion.p variants={fadeUp} custom={2} initial="hidden" whileInView="show" viewport={{ once: true }}
+            className="mx-auto mt-4 max-w-xl text-sm text-white/50">
+            {t('landing.testimonials.subtitle', 'اقرأ شهادات طلابنا الراضين حول العالم')}
+          </motion.p>
+
+          {/* Stats strip */}
+          <motion.div variants={fadeUp} custom={3} initial="hidden" whileInView="show" viewport={{ once: true }}
+            className="mt-10 inline-flex flex-wrap justify-center items-center gap-0 rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-sm overflow-hidden">
+            {[
+              { val: '500+', lbl: t('landing.testimonials.stat1', 'طالب راضٍ') },
+              { val: '4.9 ★', lbl: t('landing.testimonials.stat2', 'متوسط التقييم') },
+              { val: '98%', lbl: t('landing.testimonials.stat3', 'نسبة النجاح') },
+            ].map((s, i) => (
+              <div key={i} className={`px-8 py-4 text-center ${i > 0 ? 'border-s border-white/10' : ''}`}>
+                <div className="text-2xl font-extrabold text-accent">{s.val}</div>
+                <div className="mt-0.5 text-[11px] text-white/40">{s.lbl}</div>
+              </div>
+            ))}
+          </motion.div>
+        </div>
+
+        {/* Marquee rows */}
+        <div className="relative mt-16 space-y-4">
+          {/* Row 1 — left */}
+          <div className="flex overflow-hidden" style={{ maskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)' }}>
+            <div className="flex gap-4 flex-nowrap" style={{ animation: 'marquee 40s linear infinite', width: 'max-content' }}>
+              {[...allStudentReviews.slice(0, 6), ...allStudentReviews.slice(0, 6)].map((item, i) => (
+                <ReviewCard key={i} item={item} />
               ))}
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* TESTIMONIALS */}
-      <section className="relative py-24">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="mb-12 max-w-2xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-accent">{t('landing.testimonials.badge')}</p>
-            <h2 className="mt-3 text-4xl font-bold text-primary md:text-5xl">{t('landing.testimonials.title')}</h2>
-          </div>
-          <div className="grid gap-5 md:grid-cols-3">
-            {[
-              t('landing.testimonials.t1', { returnObjects: true }) as any,
-              t('landing.testimonials.t2', { returnObjects: true }) as any,
-              t('landing.testimonials.t3', { returnObjects: true }) as any
-            ].map((t_item, i) => (
-              <motion.figure
-                key={i}
-                variants={fadeUp}
-                custom={i}
-                initial="hidden"
-                whileInView="show"
-                viewport={{ once: true }}
-                className="relative rounded-2xl border border-border bg-card p-7 shadow-[var(--shadow-card)]"
-              >
-                <div className="flex gap-0.5 text-accent">
-                  {Array.from({ length: 5 }).map((_, k) => <Star key={k} className="h-4 w-4 fill-current" />)}
-                </div>
-                <blockquote className="mt-4 text-sm leading-relaxed text-primary/90">
-                  "{t_item.q}"
-                </blockquote>
-                <figcaption className="mt-6 border-t border-border pt-4">
-                  <div className="text-sm font-semibold text-primary">{t_item.a}</div>
-                  <div className="text-xs text-muted-foreground">{t_item.r}</div>
-                </figcaption>
-              </motion.figure>
-            ))}
+          {/* Row 2 — right */}
+          <div className="flex overflow-hidden" style={{ maskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)' }}>
+            <div className="flex gap-4 flex-nowrap" style={{ animation: 'marquee-reverse 40s linear infinite', width: 'max-content' }}>
+              {[...allStudentReviews.slice(6), ...allStudentReviews.slice(6)].map((item, i) => (
+                <ReviewCard key={i} item={item} />
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -915,6 +947,36 @@ function Index() {
           </div>
         )}
       </AnimatePresence>
+    </div>
+  );
+}
+
+function ReviewCard({ item }: { item: typeof allStudentReviews[0] }) {
+  return (
+    <div className="w-72 flex-shrink-0 rounded-2xl p-5 flex flex-col gap-3"
+      style={{ background: 'oklch(1 0 0/0.06)', border: '1px solid oklch(1 0 0/0.09)' }}>
+      {/* Stars */}
+      <div className="flex gap-0.5">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <Star key={i} className="h-3.5 w-3.5"
+            style={{ fill: i < item.rating ? 'oklch(0.78 0.16 55)' : 'oklch(1 0 0/0.15)', color: i < item.rating ? 'oklch(0.78 0.16 55)' : 'oklch(1 0 0/0.15)' }} />
+        ))}
+      </div>
+      {/* Quote */}
+      <p className="text-sm leading-relaxed line-clamp-3" style={{ color: 'oklch(1 0 0/0.78)' }}>
+        "{item.q}"
+      </p>
+      {/* Author */}
+      <div className="mt-auto flex items-center gap-3 border-t pt-3" style={{ borderColor: 'oklch(1 0 0/0.08)' }}>
+        <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
+          style={{ background: item.color }}>
+          {item.a[0].toUpperCase()}
+        </div>
+        <div className="min-w-0">
+          <p className="truncate text-xs font-semibold text-white">{item.a}</p>
+          <p className="text-[10px]" style={{ color: 'oklch(1 0 0/0.4)' }}>{item.r}</p>
+        </div>
+      </div>
     </div>
   );
 }

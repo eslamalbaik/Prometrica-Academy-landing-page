@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { KeyRound, Eye, EyeOff, CheckCircle2, AlertCircle, Loader2, ArrowLeft, Globe } from 'lucide-react'
 import { api } from '@/lib/api'
 import { pageTitle } from '@/lib/siteMeta'
+import logo from '@/assets/prometrica-logo.png'
 
 type ResetSearch = { token?: string; email?: string }
 
@@ -11,10 +12,15 @@ export const Route = createFileRoute('/reset-password')({
   head: () => ({
     meta: [{ title: pageTitle('Reset Password') }],
   }),
-  validateSearch: (search: Record<string, unknown>): ResetSearch => ({
-    token: typeof search.token === 'string' ? search.token : undefined,
-    email: typeof search.email === 'string' ? search.email : undefined,
-  }),
+  validateSearch: (search: Record<string, unknown>): ResetSearch => {
+    const pick = (k: string): string | undefined => {
+      // Defensive: some mail clients leave "&amp;" in the link, which parses the
+      // second param as "amp;email" / "amp;token". Read both spellings.
+      const v = search[k] ?? search[`amp;${k}`]
+      return typeof v === 'string' ? v : undefined
+    }
+    return { token: pick('token'), email: pick('email') }
+  },
   component: ResetPasswordPage,
 })
 
@@ -92,14 +98,9 @@ function ResetPasswordPage() {
 
         {/* Header: logo + lang toggle */}
         <div className="flex items-center justify-between mb-10">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent shadow-md shadow-primary/20">
-              <span className="text-lg font-black text-white">P</span>
-            </div>
-            <span className="text-xl font-extrabold text-gray-900 tracking-tight">
-              Prometrica <span className="text-primary">Academy</span>
-            </span>
-          </div>
+          <Link to="/" className="flex items-center gap-2">
+            <img src={logo} alt="Prometrica Academy" className="h-14 w-auto" />
+          </Link>
           <button
             type="button"
             onClick={() => i18n.changeLanguage(isAr ? 'en' : 'ar')}

@@ -40,8 +40,10 @@ export function Footer() {
           <h4 className="mb-4 text-sm font-semibold">Company</h4>
           <ul className="space-y-2 text-sm text-primary-foreground/70">
             <li><a href="#about" className="hover:text-accent">About</a></li>
-            <li><a href="#why" className="hover:text-accent">Why Prometrica</a></li>
-            <li><a href="#process" className="hover:text-accent">Process</a></li>
+            <li><a href="#packages" className="hover:text-accent">Packages</a></li>
+            <li><Link to="/faq" className="hover:text-accent">FAQ</Link></li>
+            <li><Link to="/privacy" className="hover:text-accent">Privacy Policy</Link></li>
+            <li><Link to="/terms" className="hover:text-accent">Terms &amp; Conditions</Link></li>
           </ul>
         </div>
         <div>

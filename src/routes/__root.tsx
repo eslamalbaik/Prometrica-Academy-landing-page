@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AuthProvider } from "../contexts/AuthContext";
+import { CartProvider } from "../contexts/CartContext";
 import i18n, { initI18n } from "../i18n";
 import { getLanguageAttributes, type AppLanguage } from "../lib/language";
 import { resolveLanguage, syncLanguageFromStorage } from "../lib/resolveLanguage";
@@ -161,9 +162,11 @@ function RootComponent() {
 
   return (
     <AuthProvider>
-      <QueryClientProvider client={queryClient}>
-        <Outlet />
-      </QueryClientProvider>
+      <CartProvider>
+        <QueryClientProvider client={queryClient}>
+          <Outlet />
+        </QueryClientProvider>
+      </CartProvider>
     </AuthProvider>
   );
 }

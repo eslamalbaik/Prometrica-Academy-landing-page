@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useAuth } from "@/contexts/AuthContext";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
@@ -26,7 +26,8 @@ import {
   Clock,
   FileText,
   Camera,
-  Loader2
+  Loader2,
+  RefreshCw
 } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -42,8 +43,12 @@ export const Route = createFileRoute("/student/dashboard")({
 function DashboardPage() {
   const { user, logout } = useAuth();
   const { t } = useTranslation();
-  const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : new URLSearchParams();
-  const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "account");
+  const [activeTab, setActiveTab] = useState("account");
+
+  useEffect(() => {
+    const tab = new URLSearchParams(window.location.search).get("tab");
+    if (tab) setActiveTab(tab);
+  }, []);
   
   const tabs = [
     { id: "subscriptions", label: t('tab_subscriptions', 'Subscriptions'), icon: PlayCircle },
@@ -574,17 +579,76 @@ function CertificatesTab() {
     },
   });
 
-  const handleVerify = async (uuid: string) => {
-    setVerifying(uuid);
+  const handleVerify = async (cert: any) => {
+    setVerifying(cert.ulid);
     setVerifyResult(null);
     setVerifyError('');
     try {
-      const res = await api.get(`/certificates/${uuid}/verify`);
+      const res = await api.get(`/certificates/${cert.ulid}/verify`, {
+        params: {
+          signature: cert.signature,
+          userId: cert.user_id,
+          courseId: cert.course_id
+        }
+      });
       setVerifyResult(res.data);
     } catch {
       setVerifyError(t('certificate_invalid', 'Could not verify this certificate.'));
     } finally {
       setVerifying(null);
+    }
+  };
+
+  const [downloading, setDownloading] = useState<string | null>(null);
+  const [regenerating, setRegenerating] = useState<string | null>(null);
+
+  const handleRegenerate = async (cert: any) => {
+    setRegenerating(cert.ulid);
+    try {
+      await api.post(`/student/certificates/${cert.ulid}/regenerate`);
+      toast.info(t('certificate_regenerating', 'Certificate is being updated. Please wait a few seconds then download again.'));
+    } catch {
+      toast.error(t('regenerate_failed', 'Failed to update certificate. Please try again.'));
+    } finally {
+      setRegenerating(null);
+    }
+  };
+
+  const handleDownload = async (cert: any) => {
+    setDownloading(cert.ulid);
+    try {
+      const res = await api.get(`/v1/certificates/${cert.ulid}/download`);
+      const signedUrl = res.data.download_url;
+      if (signedUrl) {
+        // Fetch file via Axios (using blob) to handle 409 Conflict/pending gracefully
+        const fileRes = await api.get(signedUrl, { responseType: 'blob' });
+        
+        const blob = new Blob([fileRes.data], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        
+        const cleanCourseTitle = cert.course?.title 
+          ? cert.course.title.toLowerCase().replace(/\s+/g, '-') 
+          : 'certificate';
+        link.setAttribute('download', `certificate-${cleanCourseTitle}.pdf`);
+        
+        document.body.appendChild(link);
+        link.click();
+        link.parentNode?.removeChild(link);
+        window.URL.revokeObjectURL(url);
+
+        toast.success(t('download_success', 'Certificate downloaded successfully!'));
+      }
+    } catch (err: any) {
+      console.error('Download failed', err);
+      if (err.response?.status === 409) {
+        toast.info(t('certificate_generating', 'Your certificate is being generated. Please wait a moment...'));
+      } else {
+        toast.error(t('download_failed', 'Failed to download certificate. Please try again.'));
+      }
+    } finally {
+      setDownloading(null);
     }
   };
 
@@ -670,33 +734,44 @@ function CertificatesTab() {
                   </div>
                 </div>
 
-                {/* UUID */}
-                <p className="text-xs text-gray-400 font-mono truncate">{cert.uuid}</p>
+                {/* ULID */}
+                <p className="text-xs text-gray-400 font-mono truncate">{cert.ulid}</p>
 
                 {/* Action buttons */}
                 <div className="flex gap-2">
                   {/* Download PDF */}
-                  <a
-                    href={`${API_BASE}/api/certificates/${cert.uuid}/download`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-1 flex items-center justify-center gap-1.5 rounded-lg bg-primary py-2 text-xs font-bold text-white hover:bg-primary/90 transition-colors"
+                  <button
+                    disabled={downloading === cert.ulid}
+                    onClick={() => handleDownload(cert)}
+                    className="flex-1 flex items-center justify-center gap-1.5 rounded-lg bg-primary py-2 text-xs font-bold text-white hover:bg-primary/90 transition-colors disabled:opacity-60"
                   >
                     <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" />
                     </svg>
-                    {t('download_pdf', 'Download PDF')}
-                  </a>
+                    {downloading === cert.ulid
+                      ? t('downloading', 'Downloading…')
+                      : t('download_pdf', 'Download PDF')}
+                  </button>
 
                   {/* Verify */}
                   <button
-                    disabled={verifying === cert.uuid}
-                    onClick={() => handleVerify(cert.uuid)}
+                    disabled={verifying === cert.ulid}
+                    onClick={() => handleVerify(cert)}
                     className="flex-1 rounded-lg border border-emerald-200 bg-emerald-50 py-2 text-xs font-bold text-emerald-700 hover:bg-emerald-100 transition-colors disabled:opacity-60"
                   >
-                    {verifying === cert.uuid
+                    {verifying === cert.ulid
                       ? t('verifying', 'Verifying…')
                       : t('verify_certificate', 'Verify')}
+                  </button>
+
+                  {/* Regenerate */}
+                  <button
+                    disabled={regenerating === cert.ulid}
+                    onClick={() => handleRegenerate(cert)}
+                    title={t('regenerate_certificate', 'Update Certificate')}
+                    className="rounded-lg border border-gray-200 bg-gray-50 px-2.5 py-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors disabled:opacity-60"
+                  >
+                    <RefreshCw className={`h-3.5 w-3.5 ${regenerating === cert.ulid ? 'animate-spin' : ''}`} />
                   </button>
                 </div>
               </div>

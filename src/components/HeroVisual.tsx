@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Pill, Activity, Award, Stethoscope } from "lucide-react";
+import { Pill, Activity, Award } from "lucide-react";
 import hero from "@/assets/hero-pharmacists.png";
 
 export function HeroVisual() {
@@ -78,9 +78,6 @@ export function HeroVisual() {
           <div className="text-sm font-bold">Weekly</div>
         </div>
       </motion.div>
-
-      {/* Floating icons */}
-      <Stethoscope className="absolute -right-2 bottom-24 h-7 w-7 text-primary/30 animate-float-rot" />
     </div>
   );
 }

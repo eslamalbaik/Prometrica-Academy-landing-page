@@ -36,11 +36,18 @@ export function sanitizeLandingReturnUrl(returnTo: string): string {
   }
 }
 
+// Pages that own their own `token` query param and must not have it consumed by auth bootstrap.
+const PAGES_WITH_OWN_TOKEN = ['/reset-password']
+
 /**
  * Read token from the current URL once, then remove token/user from the address bar immediately.
+ * Skipped on pages that use `token` for their own purpose (e.g. password reset).
  */
 export function consumeTokenFromCurrentUrl(): string | null {
   if (typeof window === 'undefined')
+    return null
+
+  if (PAGES_WITH_OWN_TOKEN.some(p => window.location.pathname === p))
     return null
 
   const url = new URL(window.location.href)

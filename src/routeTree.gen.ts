@@ -9,19 +9,30 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as StudentRouteImport } from './routes/student'
 import { Route as StoreRouteImport } from './routes/store'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as FaqRouteImport } from './routes/faq'
+import { Route as CheckoutRouteImport } from './routes/checkout'
+import { Route as CartRouteImport } from './routes/cart'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as VerifyUlidRouteImport } from './routes/verify/$ulid'
 import { Route as StudentLibraryRouteImport } from './routes/student/library'
 import { Route as StudentDashboardRouteImport } from './routes/student/dashboard'
 import { Route as CoursesIdRouteImport } from './routes/courses/$id'
 import { Route as StudentLearnIdRouteImport } from './routes/student/learn/$id'
 import { Route as AuthGoogleCallbackRouteImport } from './routes/auth/google/callback'
 
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const StudentRoute = StudentRouteImport.update({
   id: '/student',
   path: '/student',
@@ -42,6 +53,11 @@ const RegisterRoute = RegisterRouteImport.update({
   path: '/register',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -52,9 +68,29 @@ const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckoutRoute = CheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CartRoute = CartRouteImport.update({
+  id: '/cart',
+  path: '/cart',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VerifyUlidRoute = VerifyUlidRouteImport.update({
+  id: '/verify/$ulid',
+  path: '/verify/$ulid',
   getParentRoute: () => rootRouteImport,
 } as any)
 const StudentLibraryRoute = StudentLibraryRouteImport.update({
@@ -85,44 +121,62 @@ const AuthGoogleCallbackRoute = AuthGoogleCallbackRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/cart': typeof CartRoute
+  '/checkout': typeof CheckoutRoute
+  '/faq': typeof FaqRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/privacy': typeof PrivacyRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/store': typeof StoreRoute
   '/student': typeof StudentRouteWithChildren
+  '/terms': typeof TermsRoute
   '/courses/$id': typeof CoursesIdRoute
   '/student/dashboard': typeof StudentDashboardRoute
   '/student/library': typeof StudentLibraryRoute
+  '/verify/$ulid': typeof VerifyUlidRoute
   '/auth/google/callback': typeof AuthGoogleCallbackRoute
   '/student/learn/$id': typeof StudentLearnIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/cart': typeof CartRoute
+  '/checkout': typeof CheckoutRoute
+  '/faq': typeof FaqRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/privacy': typeof PrivacyRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/store': typeof StoreRoute
   '/student': typeof StudentRouteWithChildren
+  '/terms': typeof TermsRoute
   '/courses/$id': typeof CoursesIdRoute
   '/student/dashboard': typeof StudentDashboardRoute
   '/student/library': typeof StudentLibraryRoute
+  '/verify/$ulid': typeof VerifyUlidRoute
   '/auth/google/callback': typeof AuthGoogleCallbackRoute
   '/student/learn/$id': typeof StudentLearnIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/cart': typeof CartRoute
+  '/checkout': typeof CheckoutRoute
+  '/faq': typeof FaqRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/privacy': typeof PrivacyRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/store': typeof StoreRoute
   '/student': typeof StudentRouteWithChildren
+  '/terms': typeof TermsRoute
   '/courses/$id': typeof CoursesIdRoute
   '/student/dashboard': typeof StudentDashboardRoute
   '/student/library': typeof StudentLibraryRoute
+  '/verify/$ulid': typeof VerifyUlidRoute
   '/auth/google/callback': typeof AuthGoogleCallbackRoute
   '/student/learn/$id': typeof StudentLearnIdRoute
 }
@@ -130,61 +184,92 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/cart'
+    | '/checkout'
+    | '/faq'
     | '/forgot-password'
     | '/login'
+    | '/privacy'
     | '/register'
     | '/reset-password'
     | '/store'
     | '/student'
+    | '/terms'
     | '/courses/$id'
     | '/student/dashboard'
     | '/student/library'
+    | '/verify/$ulid'
     | '/auth/google/callback'
     | '/student/learn/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/cart'
+    | '/checkout'
+    | '/faq'
     | '/forgot-password'
     | '/login'
+    | '/privacy'
     | '/register'
     | '/reset-password'
     | '/store'
     | '/student'
+    | '/terms'
     | '/courses/$id'
     | '/student/dashboard'
     | '/student/library'
+    | '/verify/$ulid'
     | '/auth/google/callback'
     | '/student/learn/$id'
   id:
     | '__root__'
     | '/'
+    | '/cart'
+    | '/checkout'
+    | '/faq'
     | '/forgot-password'
     | '/login'
+    | '/privacy'
     | '/register'
     | '/reset-password'
     | '/store'
     | '/student'
+    | '/terms'
     | '/courses/$id'
     | '/student/dashboard'
     | '/student/library'
+    | '/verify/$ulid'
     | '/auth/google/callback'
     | '/student/learn/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CartRoute: typeof CartRoute
+  CheckoutRoute: typeof CheckoutRoute
+  FaqRoute: typeof FaqRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
+  PrivacyRoute: typeof PrivacyRoute
   RegisterRoute: typeof RegisterRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   StoreRoute: typeof StoreRoute
   StudentRoute: typeof StudentRouteWithChildren
+  TermsRoute: typeof TermsRoute
   CoursesIdRoute: typeof CoursesIdRoute
+  VerifyUlidRoute: typeof VerifyUlidRoute
   AuthGoogleCallbackRoute: typeof AuthGoogleCallbackRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/student': {
       id: '/student'
       path: '/student'
@@ -213,6 +298,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -227,11 +319,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cart': {
+      id: '/cart'
+      path: '/cart'
+      fullPath: '/cart'
+      preLoaderRoute: typeof CartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/verify/$ulid': {
+      id: '/verify/$ulid'
+      path: '/verify/$ulid'
+      fullPath: '/verify/$ulid'
+      preLoaderRoute: typeof VerifyUlidRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/student/library': {
@@ -289,13 +409,19 @@ const StudentRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CartRoute: CartRoute,
+  CheckoutRoute: CheckoutRoute,
+  FaqRoute: FaqRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
+  PrivacyRoute: PrivacyRoute,
   RegisterRoute: RegisterRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   StoreRoute: StoreRoute,
   StudentRoute: StudentRouteWithChildren,
+  TermsRoute: TermsRoute,
   CoursesIdRoute: CoursesIdRoute,
+  VerifyUlidRoute: VerifyUlidRoute,
   AuthGoogleCallbackRoute: AuthGoogleCallbackRoute,
 }
 export const routeTree = rootRouteImport

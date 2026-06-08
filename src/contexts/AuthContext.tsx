@@ -61,8 +61,8 @@ async function persistValidatedSession(
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<AuthUser | null>(readStoredUser);
-  const [token, setToken] = useState<string | null>(readStoredToken);
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [token, setToken] = useState<string | null>(null);
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {

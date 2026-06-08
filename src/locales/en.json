@@ -5,6 +5,17 @@
   "go_to_course": "Open Course",
   "open_course": "Open Course",
   "reply_placeholder": "Write a reply...",
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Answers to the most common questions about the platform."
+  },
+  "pricing": {
+    "badge": "Plans & Pricing",
+    "title": "Choose the plan that fits you",
+    "subtitle": "Flexible packages that grow with your academy.",
+    "free": "Free",
+    "subscribe": "Subscribe Now"
+  },
   "navbar": {
     "my_dashboard": "My Dashboard",
     "admin_dashboard": "My Admin Panel",
@@ -15,6 +26,7 @@
     "programs": "Programs",
     "why_us": "Why Us",
     "courses": "Courses",
+    "packages": "Packages",
     "store": "Store",
     "speakers": "Speakers",
     "contact": "Contact",
@@ -80,9 +92,13 @@
     "redirecting_to_login": "Redirecting you to sign in…",
     "reset_failed": "Failed to reset password. The link may have expired.",
     "forgot_password_title": "Forgot Password?",
-    "forgot_password_desc": "Enter your email and we'll send you a reset link.",
+    "forgot_password_desc": "No worries! Enter your email and we'll send you a reset link.",
     "send_reset_link": "Send Reset Link",
     "sending": "Sending…",
+    "check_your_email": "Check your email",
+    "reset_link_sent": "We've sent a password reset link to",
+    "reset_link_expires": "The link expires in 60 minutes. Check your spam folder if you don't see it.",
+    "reset_link_error": "Could not send reset link. Please check the email address.",
     "reset_email_sent": "Email Sent!",
     "reset_email_sent_desc": "We sent a reset link to",
     "reset_email_expiry": "The link expires in 60 minutes.",
@@ -175,7 +191,7 @@
       "title": "Courses",
       "viewAll": "View all →",
       "loadMore": "Load more",
-      "viewCourse": "View Course",
+      "viewCourse": "Subscribe Now",
       "lessons": "lessons"
     },
     "digital_products": {
@@ -260,6 +276,12 @@
     "testimonials": {
       "badge": "Voices",
       "title": "Trusted by pharmacists worldwide.",
+      "title_pre": "What our",
+      "title_hl": "students say",
+      "subtitle": "Read testimonials from our satisfied students around the world",
+      "stat1": "Happy students",
+      "stat2": "Avg. rating",
+      "stat3": "Pass rate",
       "t1": {
         "q": "Prometrica Academy completely changed my study method, and I passed the licensing exam on my first attempt.",
         "a": "Layla H.",
@@ -331,5 +353,35 @@
   "submit_review": "Submit Review",
   "write_review_placeholder": "Write your review here...",
   "ask_question_placeholder": "Ask a question or add a comment...",
-  "clear_selection": "Clear Choice"
+  "clear_selection": "Clear Choice",
+  "cart": {
+    "title": "Your Cart",
+    "empty": "Your cart is empty",
+    "empty_desc": "Browse our courses and add them to your cart.",
+    "browse_courses": "Browse Courses",
+    "in_cart": "In Cart",
+    "order_summary": "Order Summary",
+    "total": "Total",
+    "checkout": "Proceed to Checkout",
+    "continue_shopping": "Continue Shopping",
+    "course": "Course",
+    "product": "Product",
+    "back_to_cart": "Back to Cart",
+    "add_to_cart": "Add to Cart",
+    "view_cart": "View Cart",
+    "clear": "Clear Cart"
+  },
+  "checkout": {
+    "payment_details": "Payment Details",
+    "secure": "Secure & encrypted",
+    "card_number": "Card Number",
+    "cardholder": "Cardholder Name",
+    "expiry": "Expiry Date",
+    "cvv": "CVV",
+    "processing": "Processing…",
+    "pay_now": "Pay Now",
+    "success_title": "Payment Successful!",
+    "success_desc": "You are now enrolled. Redirecting to your dashboard…",
+    "instant_access": "You get instant access after payment."
+  }
 }
