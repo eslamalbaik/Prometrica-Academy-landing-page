@@ -1,4 +1,6 @@
 import { useEffect, useState, useRef } from "react";
+
+const API_ORIGIN = (import.meta.env.VITE_API_ORIGIN || import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/\/$/, '');
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ShoppingCart, Trash2, ArrowRight, PackageOpen } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -196,7 +198,7 @@ export function Navbar({ variant = "transparent" }: { variant?: "transparent" | 
           ) : isAuthenticated ? (
             <div className="relative group">
               <button className="flex items-center gap-2 rounded-full border border-border bg-card p-1 pe-3 shadow-sm hover:bg-accent/5 transition">
-                <img src={user?.avatar ? `http://localhost:8000/storage/${user.avatar}` : "https://placehold.co/100x100/1e293b/ffffff?text=" + (user?.name?.[0] || 'U')} alt="Avatar" className="h-8 w-8 rounded-full object-cover" />
+                <img src={user?.avatar ? `${API_ORIGIN}/storage/${user.avatar}` : "https://placehold.co/100x100/1e293b/ffffff?text=" + (user?.name?.[0] || 'U')} alt="Avatar" className="h-8 w-8 rounded-full object-cover" />
                 <span className="text-sm font-medium text-foreground">{user?.name}</span>
               </button>
               <div className="absolute end-0 top-full mt-2 w-48 rounded-xl border border-border bg-card shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">

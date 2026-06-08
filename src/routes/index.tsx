@@ -1,4 +1,6 @@
 import { useState } from "react";
+
+const API_ORIGIN = (import.meta.env.VITE_API_ORIGIN || import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/\/$/, '');
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "framer-motion";
@@ -458,7 +460,7 @@ function Index() {
                   >
                     <div className="aspect-[16/9] w-full overflow-hidden bg-muted">
                       <img 
-                        src={c.thumbnail ? `http://localhost:8000/storage/${c.thumbnail}` : 'https://placehold.co/600x400/1e293b/ffffff?text=Pharmacy+Course'} 
+                        src={c.thumbnail ? `${API_ORIGIN}/storage/${c.thumbnail}` : 'https://placehold.co/600x400/1e293b/ffffff?text=Pharmacy+Course'} 
                         alt={c.title} 
                         className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
@@ -522,7 +524,7 @@ function Index() {
                               type: 'course',
                               title: c.title,
                               price: Number(c.discount_price || c.price || 0),
-                              thumbnail: c.thumbnail ? `http://localhost:8000/storage/${c.thumbnail}` : null,
+                              thumbnail: c.thumbnail ? `${API_ORIGIN}/storage/${c.thumbnail}` : null,
                             })}
                             className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary/90 transition-colors"
                           >
@@ -588,7 +590,7 @@ function Index() {
                 >
                   <div className="aspect-[16/10] w-full overflow-hidden bg-muted relative">
                     <img
-                      src={p.thumbnail_path ? `http://localhost:8000/storage/${p.thumbnail_path}` : 'https://placehold.co/600x400/1e293b/ffffff?text=Pharmacy+eBook'}
+                      src={p.thumbnail_path ? `${API_ORIGIN}/storage/${p.thumbnail_path}` : 'https://placehold.co/600x400/1e293b/ffffff?text=Pharmacy+eBook'}
                       alt={p.title}
                       className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />

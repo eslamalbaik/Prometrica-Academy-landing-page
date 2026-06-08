@@ -1,4 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+
+const API_ORIGIN = (import.meta.env.VITE_API_ORIGIN || import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/\/$/, '');
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { api } from "@/lib/api";
 import { Navbar } from "@/components/Navbar";
@@ -349,7 +351,7 @@ function CourseDetails() {
               
               <div className="aspect-video w-full rounded-2xl overflow-hidden bg-muted mb-6 shadow-inner">
                 <img 
-                  src={course.thumbnail ? `http://localhost:8000/storage/${course.thumbnail}` : 'https://placehold.co/600x400/1e293b/ffffff?text=Course'} 
+                  src={course.thumbnail ? `${API_ORIGIN}/storage/${course.thumbnail}` : 'https://placehold.co/600x400/1e293b/ffffff?text=Course'} 
                   alt={course.title} 
                   className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
                 />
@@ -410,7 +412,7 @@ function CourseDetails() {
                     type: 'course',
                     title: course.title,
                     price: course.discount_price || course.price || 0,
-                    thumbnail: course.thumbnail ? `http://localhost:8000/storage/${course.thumbnail}` : null,
+                    thumbnail: course.thumbnail ? `${API_ORIGIN}/storage/${course.thumbnail}` : null,
                   })}
                   className="w-full inline-flex justify-center items-center gap-2 rounded-2xl bg-primary px-6 py-4 text-base font-bold text-primary-foreground transition-all hover:bg-primary/90 shadow-lg shadow-primary/25 hover:-translate-y-0.5"
                 >
