@@ -127,7 +127,7 @@ function Index() {
   const [cardCvv, setCardCvv] = useState('');
 
   const { data: dynamicCourses = [], isLoading: isLoadingCourses } = useQuery({
-    queryKey: ['landingCourses'],
+    queryKey: ['landingCourses', isAuthenticated],
     queryFn: async () => {
       const res = await api.get('/landing/courses');
       return res.data;
@@ -502,7 +502,15 @@ function Index() {
                           <span className="flex items-center gap-1"><BookOpen className="h-4 w-4" /> {c.lessons_count || 0} {t('landing.courses.lessons')}</span>
                           <span className="flex items-center gap-1"><PlayCircle className="h-4 w-4" /> {c.total_duration || 0}m</span>
                         </div>
-                        {c.is_free ? (
+                        {c.is_enrolled ? (
+                          <Link
+                            to="/student/learn/$id"
+                            params={{ id: String(c.id) }}
+                            className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700 transition-colors"
+                          >
+                            <PlayCircle className="h-4 w-4" /> {t('go_to_course', 'فتح الكورس')}
+                          </Link>
+                        ) : c.is_free ? (
                           <Link
                             to="/courses/$id"
                             params={{ id: String(c.id) }}
