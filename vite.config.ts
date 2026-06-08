@@ -103,5 +103,15 @@ export default defineConfig({
     esbuild: {
       target: "esnext",
     },
+
+    // ─── Preview server (production hosting via vite preview) ─────────────
+    preview: {
+      host: "0.0.0.0",
+      port: 3000,
+      allowedHosts: [
+        "prometricaacademy.org",
+        "www.prometricaacademy.org",
+      ],
+    },
   },
 });
