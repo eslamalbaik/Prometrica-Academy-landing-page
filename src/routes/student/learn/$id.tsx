@@ -5,7 +5,7 @@ import { api } from "@/lib/api";
 import { CourseVideoPlayer } from "@/components/video/CourseVideoPlayer";
 import { UpsellModal } from "@/components/course/UpsellModal";
 import { useTranslation } from "react-i18next";
-import { PlayCircle, CheckCircle2, ChevronDown, ArrowLeft, Loader2, Play, Lock, BookOpen, Clock, MessageSquare, Star, ThumbsUp, MessageCircle, Send } from "lucide-react";
+import { PlayCircle, CheckCircle2, ChevronDown, ArrowLeft, Loader2, Play, Lock, BookOpen, Clock, MessageSquare, Star, ThumbsUp, MessageCircle, Send, FileText, Download } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -525,6 +525,45 @@ function CoursePlayer() {
                   <div className="prose prose-sm md:prose-base dark:prose-invert max-w-none text-muted-foreground p-2 text-start" dir="auto">
                     <p>{activeLesson.description || t('no_lessons')}</p>
                   </div>
+
+                  {/* PDF Attachments */}
+                  {activeLesson.attachments && activeLesson.attachments.length > 0 && (
+                    <div className="mt-6 rounded-xl border border-border bg-card p-5">
+                      <div className="flex items-center gap-2 mb-4">
+                        <FileText className="h-5 w-5 text-red-500" />
+                        <h3 className="font-semibold text-foreground text-sm">{t('lesson_files')}</h3>
+                        <span className="inline-flex items-center justify-center rounded-full bg-red-100 px-2 py-0.5 text-xs font-bold text-red-600">
+                          {activeLesson.attachments.length}
+                        </span>
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        {activeLesson.attachments.map((att: any) => (
+                          <a
+                            key={att.id}
+                            href={`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/student/attachments/${att.id}/download`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="group flex items-center gap-3 rounded-lg border border-border bg-background px-4 py-3 text-sm font-medium text-foreground transition hover:border-red-400 hover:bg-red-50 hover:text-red-700"
+                          >
+                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-red-100 text-red-600 group-hover:bg-red-200 transition">
+                              <FileText className="h-4 w-4" />
+                            </div>
+                            <div className="flex-1 overflow-hidden text-start">
+                              <div className="truncate font-semibold">{att.title}</div>
+                              {att.file_size > 0 && (
+                                <div className="text-xs text-muted-foreground">
+                                  {att.file_size < 1048576
+                                    ? `${(att.file_size / 1024).toFixed(1)} KB`
+                                    : `${(att.file_size / 1048576).toFixed(1)} MB`}
+                                </div>
+                              )}
+                            </div>
+                            <Download className="h-4 w-4 shrink-0 opacity-50 group-hover:opacity-100 transition" />
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </TabsContent>
 
                 {/* Q&A Content */}
