@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { PricingPlans } from "@/components/landing/PricingPlans";
 import { BundlesSection } from "@/components/landing/BundlesSection";
 import { FaqSection } from "@/components/landing/FaqSection";
@@ -711,6 +712,9 @@ function Index() {
       <FaqSection limit={6} />
 
       <Footer />
+
+      {/* WhatsApp floating button */}
+      <WhatsAppButton />
 
       {/* MOCK CHECKOUT MODAL */}
       <AnimatePresence>
