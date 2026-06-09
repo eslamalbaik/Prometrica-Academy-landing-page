@@ -43,7 +43,6 @@ export function Navbar({ variant = "transparent" }: { variant?: "transparent" | 
     { href: "#courses", label: t('navbar.courses') },
     { href: "#packages", label: t('navbar.packages', 'Packages') },
     { href: "/store", label: t('navbar.store', 'Store') },
-    { href: "#speakers", label: t('navbar.speakers') },
     { href: "#contact", label: t('navbar.contact') },
   ];
 

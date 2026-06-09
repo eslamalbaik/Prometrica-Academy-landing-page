@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   GraduationCap, Stethoscope, ClipboardCheck, MessageSquare,
   FlaskConical, Compass, Sparkles, ShieldCheck, Globe2, Users,
-  Headphones, Briefcase, ArrowRight, CheckCircle2, Calendar, BookOpen, Star, Gift,
+  Headphones, Briefcase, ArrowRight, BookOpen, Star, Gift,
   CreditCard, Lock, ShoppingBag, Loader2, FileText, Check, AlertCircle, X,
 } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
@@ -15,7 +15,6 @@ import { Footer } from "@/components/Footer";
 import { PricingPlans } from "@/components/landing/PricingPlans";
 import { FaqSection } from "@/components/landing/FaqSection";
 import { HeroVisual } from "@/components/HeroVisual";
-import { Counter } from "@/components/Counter";
 import { api } from "@/lib/api";
 import { Link } from "@tanstack/react-router";
 import { PlayCircle } from "lucide-react";
@@ -91,19 +90,19 @@ const testimonials = [
 
 const allStudentReviews = [
   // Row 1
-  { q: 'اسامة التميمي عم الجميع', a: 'خالد جودت', r: 'طالب صيدلة', rating: 4, color: '#1e4b8f' },
-  { q: 'كل الاحترام للمعلمين', a: 'ماجد أخمد', r: 'طالب صيدلة', rating: 5, color: '#0e7a6e' },
-  { q: 'الله يجزيكم الخير', a: 'ياسمين ابراهيم', r: 'صيدلانية', rating: 4, color: '#8b4513' },
-  { q: 'غيرت أكاديمية بروميتريكا طريقة دراستي تماماً، واجتزت امتحان الترخيص من المحاولة الأولى.', a: 'ليلى هـ.', r: 'صيدلانية مرخصة', rating: 5, color: '#6b21a8' },
-  { q: 'كان مستوى الاحترافية وأسئلة التدريب استثنائياً وواقعياً.', a: 'عمر س.', r: 'صيدلاني سريري', rating: 5, color: '#0f5132' },
-  { q: 'أخيراً، شريك تعليمي يركز على الفهم العميق والثقة — وليس الحفظ عن ظهر قلب.', a: 'د. سارة م.', r: 'صيدلانية مستشفى', rating: 5, color: '#92400e' },
+  { q: 'اسامة التميمي عم الجميع', q_en: 'Osama Al-Tamimi is everyone\'s mentor', a: 'خالد جودت', r: 'طالب صيدلة', r_en: 'Pharmacy Student', rating: 4, color: '#1e4b8f' },
+  { q: 'كل الاحترام للمعلمين', q_en: 'Full respect to all the instructors', a: 'ماجد أخمد', r: 'طالب صيدلة', r_en: 'Pharmacy Student', rating: 5, color: '#0e7a6e' },
+  { q: 'الله يجزيكم الخير', q_en: 'May God reward you with all the best', a: 'ياسمين ابراهيم', r: 'صيدلانية', r_en: 'Pharmacist', rating: 4, color: '#8b4513' },
+  { q: 'غيرت أكاديمية بروميتريكا طريقة دراستي تماماً، واجتزت امتحان الترخيص من المحاولة الأولى.', q_en: 'Prometrica Academy completely changed my study method, and I passed the licensing exam on my first attempt.', a: 'ليلى هـ.', r: 'صيدلانية مرخصة', r_en: 'Licensed Pharmacist', rating: 5, color: '#6b21a8' },
+  { q: 'كان مستوى الاحترافية وأسئلة التدريب استثنائياً وواقعياً.', q_en: 'The level of professionalism and practice questions were exceptional and realistic.', a: 'عمر س.', r: 'صيدلاني سريري', r_en: 'Clinical Pharmacist', rating: 5, color: '#0f5132' },
+  { q: 'أخيراً، شريك تعليمي يركز على الفهم العميق والثقة — وليس الحفظ عن ظهر قلب.', q_en: 'Finally, an educational partner that focuses on deep understanding and confidence — not rote memorization.', a: 'د. سارة م.', r: 'صيدلانية مستشفى', r_en: 'Hospital Pharmacist', rating: 5, color: '#92400e' },
   // Row 2
-  { q: 'منصة جدا جميلة وشرح ممتاز', a: 'NASR Alsayed', r: 'Pharmacist', rating: 5, color: '#1e3a5f' },
-  { q: 'يعطيكم العافية لكل الاساتذه واتمنا التوفيق والنجاح الي وللجميع', a: 'سيف الدين ايمن براسنه', r: 'طالب صيدلة', rating: 5, color: '#065f46' },
-  { q: 'ماشاء على الاستاذ احمد الحطبه افضل مدرس وسريع الفهم منه', a: 'هيا القضاه', r: 'صيدلانية', rating: 5, color: '#7c2d12' },
-  { q: 'برنامج الإعداد أعطاني الثقة الكاملة قبل الاختبار، ونجحت بامتياز.', a: 'أحمد م.', r: 'صيدلاني مرخص', rating: 5, color: '#1e4b8f' },
-  { q: 'المحتوى منظم ومركّز — لا وقت ضائع، كل ثانية لها قيمة.', a: 'نور ع.', r: 'صيدلانية', rating: 5, color: '#5b21b6' },
-  { q: 'تجربة تعلم احترافية من أول يوم حتى آخر يوم — أنصح بها كل صيدلاني.', a: 'فيصل ر.', r: 'صيدلاني سريري', rating: 5, color: '#0e7a6e' },
+  { q: 'منصة جدا جميلة وشرح ممتاز', q_en: 'A very beautiful platform with excellent explanations', a: 'NASR Alsayed', r: 'صيدلاني', r_en: 'Pharmacist', rating: 5, color: '#1e3a5f' },
+  { q: 'يعطيكم العافية لكل الاساتذه واتمنا التوفيق والنجاح الي وللجميع', q_en: 'Thank you to all instructors — wishing success for myself and everyone.', a: 'سيف الدين ايمن براسنه', r: 'طالب صيدلة', r_en: 'Pharmacy Student', rating: 5, color: '#065f46' },
+  { q: 'ماشاء على الاستاذ احمد الحطبه افضل مدرس وسريع الفهم منه', q_en: 'Mashallah on Professor Ahmad Al-Hatba — the best teacher, so clear and easy to understand.', a: 'هيا القضاه', r: 'صيدلانية', r_en: 'Pharmacist', rating: 5, color: '#7c2d12' },
+  { q: 'برنامج الإعداد أعطاني الثقة الكاملة قبل الاختبار، ونجحت بامتياز.', q_en: 'The preparation program gave me full confidence before the exam, and I passed with distinction.', a: 'أحمد م.', r: 'صيدلاني مرخص', r_en: 'Licensed Pharmacist', rating: 5, color: '#1e4b8f' },
+  { q: 'المحتوى منظم ومركّز — لا وقت ضائع، كل ثانية لها قيمة.', q_en: 'The content is organized and focused — no wasted time, every second has value.', a: 'نور ع.', r: 'صيدلانية', r_en: 'Pharmacist', rating: 5, color: '#5b21b6' },
+  { q: 'تجربة تعلم احترافية من أول يوم حتى آخر يوم — أنصح بها كل صيدلاني.', q_en: 'A professional learning experience from day one to the last — I recommend it to every pharmacist.', a: 'فيصل ر.', r: 'صيدلاني سريري', r_en: 'Clinical Pharmacist', rating: 5, color: '#0e7a6e' },
 ];
 
 const fadeUp = {
@@ -112,7 +111,7 @@ const fadeUp = {
 };
 
 function Index() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { isAuthenticated } = useAuth();
   const { addToCart, isInCart } = useCart();
   const queryClient = useQueryClient();
@@ -267,9 +266,7 @@ function Index() {
             </motion.h1>
 
             <motion.p variants={fadeUp} custom={2} className="mt-6 max-w-xl text-lg text-muted-foreground">
-              Prometrica Academy delivers strategic learning paths, realistic exams, and complete
-              professional development — built so pharmacists pass Prometric exams and excel in
-              competitive job markets.
+              {t('landing.hero.desc')}
             </motion.p>
 
             <motion.div variants={fadeUp} custom={3} className="mt-8 flex flex-wrap gap-3">
@@ -282,13 +279,6 @@ function Index() {
               </a>
             </motion.div>
 
-            <motion.div variants={fadeUp} custom={4} className="mt-10 flex flex-wrap items-center gap-6 text-xs text-muted-foreground">
-              {[t('landing.hero.feat1'), t('landing.hero.feat2'), t('landing.hero.feat3')].map((feat, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-accent" /> {feat}
-                </div>
-              ))}
-            </motion.div>
           </motion.div>
 
           <div className="flex justify-center">
@@ -298,7 +288,7 @@ function Index() {
       </section>
 
       {/* MARQUEE / TRUST */}
-      <section className="relative overflow-hidden border-y border-border bg-card/60 py-5">
+      <section dir="ltr" className="relative overflow-hidden border-y border-border bg-card/60 py-5">
         <div className="flex w-max animate-marquee gap-16 whitespace-nowrap text-sm font-medium text-muted-foreground">
           {[...Array(2)].map((_, k) => (
             <div key={k} className="flex items-center gap-16">
@@ -348,22 +338,8 @@ function Index() {
         </div>
       </section>
 
-      {/* ABOUT band */}
-      <section id="about" className="relative py-10">
-        <div className="mx-auto max-w-5xl px-6 text-center">
-          <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-3xl font-bold text-primary md:text-5xl">
-            {t('landing.about.title1')}
-            <span className="text-gradient">{t('landing.about.title2')}</span>
-          </motion.h2>
-          <motion.p initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.2 }} className="mx-auto mt-5 max-w-2xl text-muted-foreground">
-            Stay at the edge of healthcare with our specialist webinars. Build deep understanding,
-            present your expertise, and grow your professional reach.
-          </motion.p>
-          <a href="#programs" className="mt-8 inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-soft)] transition hover:bg-accent hover:text-accent-foreground">
-            {t('landing.about.btn')} <ArrowRight className="h-4 w-4" />
-          </a>
-        </div>
-      </section>
+      {/* PRICING PLANS */}
+      <PricingPlans />
 
       {/* PROGRAMS */}
       <section id="programs" className="relative py-24">
@@ -639,39 +615,6 @@ function Index() {
         </div>
       </section>
 
-      {/* PRICING PLANS */}
-      <PricingPlans />
-
-      {/* FAQ */}
-      <FaqSection limit={6} />
-
-      {/* STATS */}
-      <section className="relative py-24">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="relative overflow-hidden rounded-3xl bg-primary px-8 py-14 text-primary-foreground md:px-14">
-            <div className="absolute -left-20 -top-20 h-72 w-72 rounded-full bg-accent/30 blur-3xl" />
-            <div className="absolute -right-20 -bottom-20 h-72 w-72 rounded-full bg-[oklch(0.78_0.16_55/0.35)] blur-3xl" />
-            <div className="relative grid gap-10 text-center md:grid-cols-4 md:text-left">
-              {[
-                { v: 10, s: "+", l: "{t('landing.stats.s1')}" },
-                { v: 5000, s: "+", l: "{t('landing.stats.s2')}" },
-                { v: 98, s: "%", l: "{t('landing.stats.s3')}" },
-                { v: 24, s: "/7", l: "{t('landing.stats.s4')}" },
-              ].map((s) => (
-                <div key={s.l}>
-                  <div className="text-5xl font-bold md:text-6xl">
-                    <span className="bg-gradient-to-r from-accent to-[oklch(0.78_0.16_55)] bg-clip-text text-transparent">
-                      <Counter to={s.v} suffix={s.s} />
-                    </span>
-                  </div>
-                  <p className="mt-2 text-sm text-primary-foreground/70">{s.l}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* WHY CHOOSE (cards grid) */}
       <section id="speakers" className="relative py-24">
         <div className="mx-auto max-w-7xl px-6">
@@ -737,68 +680,31 @@ function Index() {
             {t('landing.testimonials.subtitle', 'اقرأ شهادات طلابنا الراضين حول العالم')}
           </motion.p>
 
-          {/* Stats strip */}
-          <motion.div variants={fadeUp} custom={3} initial="hidden" whileInView="show" viewport={{ once: true }}
-            className="mt-10 inline-flex flex-wrap justify-center items-center gap-0 rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-sm overflow-hidden">
-            {[
-              { val: '500+', lbl: t('landing.testimonials.stat1', 'طالب راضٍ') },
-              { val: '4.9 ★', lbl: t('landing.testimonials.stat2', 'متوسط التقييم') },
-              { val: '98%', lbl: t('landing.testimonials.stat3', 'نسبة النجاح') },
-            ].map((s, i) => (
-              <div key={i} className={`px-8 py-4 text-center ${i > 0 ? 'border-s border-white/10' : ''}`}>
-                <div className="text-2xl font-extrabold text-accent">{s.val}</div>
-                <div className="mt-0.5 text-[11px] text-white/40">{s.lbl}</div>
-              </div>
-            ))}
-          </motion.div>
         </div>
 
         {/* Marquee rows */}
         <div className="relative mt-16 space-y-4">
           {/* Row 1 — left */}
-          <div className="flex overflow-hidden" style={{ maskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)' }}>
+          <div dir="ltr" className="flex overflow-hidden" style={{ maskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)' }}>
             <div className="flex gap-4 flex-nowrap" style={{ animation: 'marquee 40s linear infinite', width: 'max-content' }}>
               {[...allStudentReviews.slice(0, 6), ...allStudentReviews.slice(0, 6)].map((item, i) => (
-                <ReviewCard key={i} item={item} />
+                <ReviewCard key={i} item={item} lang={i18n.language} />
               ))}
             </div>
           </div>
           {/* Row 2 — right */}
-          <div className="flex overflow-hidden" style={{ maskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)' }}>
+          <div dir="ltr" className="flex overflow-hidden" style={{ maskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)' }}>
             <div className="flex gap-4 flex-nowrap" style={{ animation: 'marquee-reverse 40s linear infinite', width: 'max-content' }}>
               {[...allStudentReviews.slice(6), ...allStudentReviews.slice(6)].map((item, i) => (
-                <ReviewCard key={i} item={item} />
+                <ReviewCard key={i} item={item} lang={i18n.language} />
               ))}
             </div>
           </div>
         </div>
       </section>
 
-      {/* FINAL CTA */}
-      <section className="relative pb-12 pt-12">
-        <div className="mx-auto max-w-6xl px-6">
-          <div className="relative overflow-hidden rounded-[2rem] border border-border bg-card px-8 py-16 text-center shadow-[var(--shadow-card)] md:px-16">
-            <div className="absolute -left-20 top-0 h-72 w-72 rounded-full bg-accent/10 blur-3xl" />
-            <div className="absolute -right-20 bottom-0 h-72 w-72 rounded-full bg-[oklch(0.78_0.16_55/0.12)] blur-3xl" />
-            <Calendar className="mx-auto h-10 w-10 text-accent" />
-            <h2 className="mt-6 text-4xl font-bold text-primary md:text-5xl">
-              {t('landing.cta.title1')}{" "}<span className="text-gradient">{t('landing.cta.title2')}</span>
-            </h2>
-            <p className="mx-auto mt-5 max-w-2xl text-muted-foreground">
-              Begin your journey with Prometrica Academy to secure your professional license,
-              sharpen your clinical knowledge, and excel in healthcare.
-            </p>
-            <div className="mt-8 flex flex-wrap justify-center gap-3">
-              <Link to="/register" className="inline-flex items-center gap-2 rounded-full bg-accent px-7 py-3.5 text-sm font-semibold text-accent-foreground shadow-[var(--shadow-glow)] transition hover:brightness-110">
-                {t('landing.cta.btn1')} <ArrowRight className="h-4 w-4" />
-              </Link>
-              <a href="#contact" className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-7 py-3.5 text-sm font-semibold text-primary transition hover:border-accent">
-                Contact Advisor
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* FAQ */}
+      <FaqSection limit={6} />
 
       <Footer />
 
@@ -961,7 +867,11 @@ function Index() {
   );
 }
 
-function ReviewCard({ item }: { item: typeof allStudentReviews[0] }) {
+function ReviewCard({ item, lang }: { item: typeof allStudentReviews[0]; lang: string }) {
+  const isAr = lang === 'ar';
+  const quote = isAr ? item.q : (item.q_en ?? item.q);
+  const role  = isAr ? item.r : (item.r_en ?? item.r);
+
   return (
     <div className="w-72 flex-shrink-0 rounded-2xl p-5 flex flex-col gap-3"
       style={{ background: 'oklch(1 0 0/0.06)', border: '1px solid oklch(1 0 0/0.09)' }}>
@@ -974,7 +884,7 @@ function ReviewCard({ item }: { item: typeof allStudentReviews[0] }) {
       </div>
       {/* Quote */}
       <p className="text-sm leading-relaxed line-clamp-3" style={{ color: 'oklch(1 0 0/0.78)' }}>
-        "{item.q}"
+        "{quote}"
       </p>
       {/* Author */}
       <div className="mt-auto flex items-center gap-3 border-t pt-3" style={{ borderColor: 'oklch(1 0 0/0.08)' }}>
@@ -984,7 +894,7 @@ function ReviewCard({ item }: { item: typeof allStudentReviews[0] }) {
         </div>
         <div className="min-w-0">
           <p className="truncate text-xs font-semibold text-white">{item.a}</p>
-          <p className="text-[10px]" style={{ color: 'oklch(1 0 0/0.4)' }}>{item.r}</p>
+          <p className="text-[10px]" style={{ color: 'oklch(1 0 0/0.4)' }}>{role}</p>
         </div>
       </div>
     </div>

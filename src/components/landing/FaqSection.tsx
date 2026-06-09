@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { Plus, Minus, HelpCircle } from "lucide-react";
+import { Plus, Minus } from "lucide-react";
 import { api } from "@/lib/api";
 
 interface Faq {
@@ -29,9 +29,6 @@ export function FaqSection({ limit }: { limit?: number }) {
     <section id="faq" className="relative py-24">
       <div className="mx-auto max-w-3xl px-4">
         <div className="mb-12 text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
-            <HelpCircle className="h-7 w-7 text-primary" />
-          </div>
           <h2 className="text-3xl font-extrabold tracking-tight text-foreground md:text-4xl">
             {t("faq.title", "Frequently Asked Questions")}
           </h2>

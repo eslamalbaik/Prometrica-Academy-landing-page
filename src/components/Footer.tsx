@@ -33,7 +33,6 @@ export function Footer() {
           <ul className="space-y-2 text-sm text-primary-foreground/70">
             <li><a href="#programs" className="hover:text-accent">Programs</a></li>
             <li><a href="#courses" className="hover:text-accent">Courses</a></li>
-            <li><a href="#speakers" className="hover:text-accent">Speakers</a></li>
           </ul>
         </div>
         <div>

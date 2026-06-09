@@ -1,6 +1,6 @@
 export type AppLanguage = 'en' | 'ar'
 
-export const DEFAULT_LANGUAGE: AppLanguage = 'en'
+export const DEFAULT_LANGUAGE: AppLanguage = 'ar'
 
 export function normalizeLanguage(value: string | null | undefined): AppLanguage {
   return value === 'ar' ? 'ar' : 'en'
