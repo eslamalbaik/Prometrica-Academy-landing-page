@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react'
 
 export interface CartItem {
   id: number
-  type: 'course' | 'product'
+  type: 'course' | 'product' | 'bundle'
   title: string
   price: number
   thumbnail: string | null

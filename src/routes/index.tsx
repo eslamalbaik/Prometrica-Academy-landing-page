@@ -13,6 +13,7 @@ import {
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { PricingPlans } from "@/components/landing/PricingPlans";
+import { BundlesSection } from "@/components/landing/BundlesSection";
 import { FaqSection } from "@/components/landing/FaqSection";
 import { HeroVisual } from "@/components/HeroVisual";
 import { api } from "@/lib/api";
@@ -530,6 +531,9 @@ function Index() {
           </div>
         </div>
       </section>
+
+      {/* BUNDLES */}
+      <BundlesSection />
 
       {/* DIGITAL PRODUCTS (eBooks & Study Materials) */}
       <section id="digital-products" className="relative bg-background py-24">
