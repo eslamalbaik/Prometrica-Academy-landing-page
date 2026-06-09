@@ -56,7 +56,29 @@ interface Props {
   poster?: string;
 }
 
+/** Convert player.mediadelivery.net/play/LIB/ID  →  iframe.mediadelivery.net/embed/LIB/ID */
+function toBunnyEmbed(url: string): string | null {
+  const m = url.match(/(?:player|iframe)\.mediadelivery\.net\/(?:play|embed)\/(\d+)\/([a-f0-9-]+)/i);
+  if (!m) return null;
+  return `https://iframe.mediadelivery.net/embed/${m[1]}/${m[2]}?autoplay=false&loop=false&muted=false&responsive=true`;
+}
+
 export function CourseVideoPlayer({ src, lessonId, onEnded, onAutoCompleted, poster }: Props) {
+  const bunnyEmbed = toBunnyEmbed(src);
+
+  if (bunnyEmbed) {
+    return (
+      <div className="relative h-full w-full bg-black" style={{ aspectRatio: '16/9' }}>
+        <iframe
+          src={bunnyEmbed}
+          className="absolute inset-0 h-full w-full"
+          allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
+          allowFullScreen
+          style={{ border: 'none' }}
+        />
+      </div>
+    );
+  }
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const hideTimer = useRef<number | null>(null);
