@@ -339,6 +339,17 @@ export function QuizPlayer({ quizId, onQuizPassed, onContinueLearning, onBack }:
                     transition={{ duration: 0.2 }}
                     className="w-full"
                   >
+                    {/* FTR-003: Question image */}
+                    {quiz.questions[currentQuestionIndex].image_path && (
+                      <div className="mb-4 overflow-hidden rounded-xl border border-slate-100">
+                        <img
+                          src={`${(import.meta.env.VITE_API_URL || 'http://localhost:8000')}/storage/${quiz.questions[currentQuestionIndex].image_path}`}
+                          alt="Question illustration"
+                          className="w-full max-h-64 object-contain bg-slate-50"
+                        />
+                      </div>
+                    )}
+
                     <h4 className="text-base md:text-lg font-bold text-slate-900 mb-4 leading-relaxed">
                       {quiz.questions[currentQuestionIndex].question_text}
                     </h4>
@@ -347,14 +358,14 @@ export function QuizPlayer({ quizId, onQuizPassed, onContinueLearning, onBack }:
                       {quiz.questions[currentQuestionIndex].options.map((option: any, idx: number) => {
                         const isSelected = userAnswers[quiz.questions[currentQuestionIndex].id] === option.id;
                         const optionLabel = String.fromCharCode(65 + idx); // A, B, C, D
-                        
+
                         return (
                           <button
                             key={option.id}
                             onClick={() => handleSelectOption(quiz.questions[currentQuestionIndex].id, option.id)}
                             className={`flex items-center gap-4 py-3 px-4 rounded-xl border-2 transition-all duration-200 text-start w-full cursor-pointer
-                              ${isSelected 
-                                ? 'border-emerald-500 bg-emerald-50/50 text-emerald-950 shadow-sm' 
+                              ${isSelected
+                                ? 'border-emerald-500 bg-emerald-50/50 text-emerald-950 shadow-sm'
                                 : 'border-slate-100 bg-white hover:bg-slate-50 hover:border-slate-300 text-slate-800'
                               }
                             `}
@@ -364,9 +375,19 @@ export function QuizPlayer({ quizId, onQuizPassed, onContinueLearning, onBack }:
                             `}>
                               {optionLabel}
                             </div>
-                            <span className="text-sm md:text-base font-semibold flex-1 leading-snug">
-                              {option.option_text}
-                            </span>
+                            <div className="flex flex-col flex-1 gap-1">
+                              {/* FTR-003: Option image */}
+                              {option.image_path && (
+                                <img
+                                  src={`${(import.meta.env.VITE_API_URL || 'http://localhost:8000')}/storage/${option.image_path}`}
+                                  alt={option.option_text}
+                                  className="max-h-20 max-w-[160px] rounded-lg object-contain"
+                                />
+                              )}
+                              <span className="text-sm md:text-base font-semibold leading-snug">
+                                {option.option_text}
+                              </span>
+                            </div>
                           </button>
                         );
                       })}
@@ -502,7 +523,17 @@ export function QuizPlayer({ quizId, onQuizPassed, onContinueLearning, onBack }:
                         `}>
                           {isCorrect ? <Check className="h-3.5 w-3.5" /> : <X className="h-3.5 w-3.5" />}
                         </div>
-                        <h5 className="text-base font-bold text-slate-800">{index + 1}. {question.question_text}</h5>
+                        <div className="flex-1">
+                          {/* FTR-003: Question image in results */}
+                          {question.image_path && (
+                            <img
+                              src={`${(import.meta.env.VITE_API_URL || 'http://localhost:8000')}/storage/${question.image_path}`}
+                              alt="Question illustration"
+                              className="mb-2 max-h-40 rounded-lg object-contain border border-slate-100"
+                            />
+                          )}
+                          <h5 className="text-base font-bold text-slate-800">{index + 1}. {question.question_text}</h5>
+                        </div>
                       </div>
 
                       <div className="flex flex-col gap-2 pl-9">

@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "@tanstack/react-router";
 import { Check, X, Crown, Sparkles } from "lucide-react";
 import { api } from "@/lib/api";
+import { RiyalSymbol } from "@/components/ui/RiyalSymbol";
 
 interface FeatureItem { text: string; text_en?: string; included: boolean }
 interface FeatureGroup { title: string; title_en?: string; items: FeatureItem[] }
@@ -111,9 +112,14 @@ export function PricingPlans() {
                     ) : (
                       <div className="flex items-end gap-2">
                         <span className="text-4xl font-black tabular-nums">{priceNum.toLocaleString()}</span>
-                        <span className={`pb-1 text-sm ${featured ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
-                          {pick(plan.period, plan.period_en)}
+                        <span className={`pb-1.5 text-lg font-bold ${featured ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
+                          <RiyalSymbol size="0.9em" />
                         </span>
+                        {pick(plan.period, plan.period_en) && (
+                          <span className={`pb-1 text-sm ${featured ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
+                            {pick(plan.period, plan.period_en)}
+                          </span>
+                        )}
                       </div>
                     )}
                   </div>

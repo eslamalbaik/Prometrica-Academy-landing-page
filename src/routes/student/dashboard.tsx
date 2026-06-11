@@ -53,6 +53,7 @@ function DashboardPage() {
   const tabs = [
     { id: "subscriptions", label: t('tab_subscriptions', 'Subscriptions'), icon: PlayCircle },
     { id: "courses", label: t('tab_courses', 'Courses'), icon: BookOpen },
+    { id: "study-plan", label: t('tab_study_plan', 'Study Plan'), icon: CheckCircle2, href: '/student/study-plan' },
     { id: "certificates", label: t('tab_certificates', 'Certificates'), icon: Award },
     { id: "account", label: t('tab_account', 'Account'), icon: Settings },
     { id: "profile", label: t('tab_profile', 'Profile'), icon: User },
