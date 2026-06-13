@@ -1,7 +1,7 @@
 import axios from 'axios'
 import type { AuthUser } from '@/lib/normalizeUser'
 
-const API_ORIGIN = (import.meta.env.VITE_API_ORIGIN || 'http://localhost:8000').replace(/\/$/, '')
+const API_ORIGIN = (import.meta.env.VITE_API_URL || import.meta.env.VITE_API_ORIGIN || 'http://localhost:8000').replace(/\/$/, '')
 
 export interface AuthResponse {
   success: boolean

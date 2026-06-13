@@ -3,7 +3,7 @@ import { api } from '@/lib/api'
 import type { AuthUser } from '@/lib/normalizeUser'
 import { sanitizeLandingReturnUrl } from '@/lib/authUrl'
 
-const API_ORIGIN = (import.meta.env.VITE_API_ORIGIN || 'http://localhost:8000').replace(/\/$/, '')
+const API_ORIGIN = (import.meta.env.VITE_API_URL || import.meta.env.VITE_API_ORIGIN || 'http://localhost:8000').replace(/\/$/, '')
 const LANDING_ORIGIN = (import.meta.env.VITE_LANDING_URL || 'http://localhost:8080').replace(/\/$/, '')
 export const FRONTEND_URL = (import.meta.env.VITE_FRONTEND_URL || 'http://localhost:5173').replace(/\/$/, '')
 
