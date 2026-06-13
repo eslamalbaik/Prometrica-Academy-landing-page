@@ -2,7 +2,7 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { BookOpen, CheckCircle2, Circle, Calendar, Trophy, BellOff } from 'lucide-react'
-import { useTranslation } from '../../i18n'
+import { useTranslation } from 'react-i18next'
 import { api } from '../../lib/api'
 
 export const Route = createFileRoute('/student/study-plan')({
