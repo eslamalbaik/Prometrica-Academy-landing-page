@@ -42,12 +42,21 @@ function DashboardPage() {
   const { user, logout } = useAuth();
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("account");
+  // Track touch start position to distinguish tap from scroll on mobile
+  const touchRef = useRef<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
     const tab = new URLSearchParams(window.location.search).get("tab");
     if (tab) setActiveTab(tab);
   }, []);
-  
+
+  const switchTab = (id: string) => {
+    setActiveTab(id);
+    const url = new URL(window.location.href);
+    url.searchParams.set("tab", id);
+    window.history.replaceState({}, "", url.toString());
+  };
+
   const tabs = [
     { id: "subscriptions", label: t('tab_subscriptions', 'Subscriptions'), icon: PlayCircle },
     { id: "courses", label: t('tab_courses', 'Courses'), icon: BookOpen },
@@ -62,7 +71,7 @@ function DashboardPage() {
   return (
     <div className="w-full">
       <div className="mx-auto max-w-7xl px-4 md:px-6">
-        
+
         {/* Tab Navigation (Horizontal Scrollable) */}
         <div className="mb-8 overflow-x-auto hide-scrollbar rounded-2xl bg-white p-2 shadow-sm border border-gray-100">
           <div className="flex w-max items-center gap-1.5">
@@ -72,15 +81,34 @@ function DashboardPage() {
               return (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`group relative flex items-center gap-2 rounded-xl px-5 py-3 text-base font-bold transition-all duration-200 ${
-                    isActive 
-                      ? 'text-emerald-700 bg-emerald-50' 
+                  style={{ touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' }}
+                  onPointerDown={(e) => {
+                    touchRef.current = { x: e.clientX, y: e.clientY };
+                  }}
+                  onPointerUp={(e) => {
+                    const start = touchRef.current;
+                    if (start) {
+                      const dx = Math.abs(e.clientX - start.x);
+                      const dy = Math.abs(e.clientY - start.y);
+                      // Only switch tab if finger didn't scroll more than 8px
+                      if (dx < 8 && dy < 8) {
+                        switchTab(tab.id);
+                      }
+                    }
+                    touchRef.current = null;
+                  }}
+                  onClick={() => switchTab(tab.id)}
+                  className={`group relative flex items-center gap-2 rounded-xl px-4 py-3 text-sm md:text-base font-bold transition-all duration-200 select-none ${
+                    isActive
+                      ? 'text-emerald-700 bg-emerald-50'
                       : 'text-gray-500 hover:text-slate-800 hover:bg-gray-50'
                   }`}
                 >
-                  <Icon className={`h-5 w-5 transition-colors ${isActive ? 'text-emerald-500' : 'text-gray-400 group-hover:text-emerald-400'}`} />
-                  <span>{tab.label}</span>
+                  <Icon className={`h-5 w-5 shrink-0 transition-colors ${isActive ? 'text-emerald-500' : 'text-gray-400 group-hover:text-emerald-400'}`} />
+                  <span className="whitespace-nowrap">{tab.label}</span>
+                  {isActive && (
+                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 w-6 rounded-full bg-emerald-500" />
+                  )}
                 </button>
               );
             })}
@@ -109,7 +137,7 @@ function DashboardPage() {
             </motion.div>
           </AnimatePresence>
         </div>
-        
+
       </div>
     </div>
   );
