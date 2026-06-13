@@ -51,7 +51,7 @@ function DashboardPage() {
   const tabs = [
     { id: "subscriptions", label: t('tab_subscriptions', 'Subscriptions'), icon: PlayCircle },
     { id: "courses", label: t('tab_courses', 'Courses'), icon: BookOpen },
-    { id: "study-plan", label: t('tab_study_plan', 'Study Plan'), icon: CheckCircle2, href: '/student/study-plan' },
+    { id: "study-plan", label: t('tab_study_plan', 'Study Plan'), icon: CheckCircle2 },
     { id: "certificates", label: t('tab_certificates', 'Certificates'), icon: Award },
     { id: "account", label: t('tab_account', 'Account'), icon: Settings },
     { id: "profile", label: t('tab_profile', 'Profile'), icon: User },
@@ -105,6 +105,7 @@ function DashboardPage() {
               {activeTab === 'certificates' && <CertificatesTab />}
               {activeTab === 'profile' && <ProfileTab user={user} />}
               {activeTab === 'help' && <HelpTab />}
+              {activeTab === 'study-plan' && <StudyPlanTab />}
             </motion.div>
           </AnimatePresence>
         </div>
@@ -906,4 +907,169 @@ function EmptyState({ message, icon }: { message: string; icon: React.ReactNode 
       <p className="text-sm font-medium text-gray-500">{message}</p>
     </div>
   );
+}
+
+// ─── Study Plan Tab ───────────────────────────────────────────────────────────
+
+interface SPTask {
+  id: number
+  title: string
+  type: 'lesson' | 'quiz'
+  scheduled_date: string
+  completed_at: string | null
+  lesson_id: number | null
+  quiz_id: number | null
+}
+interface SPlan {
+  id: number
+  course: { id: number; title: string; thumbnail: string | null } | null
+  start_date: string
+  end_date: string | null
+  status: string
+  progress: number
+  completed_tasks: number
+  total_tasks: number
+  tasks: SPTask[]
+}
+
+function StudyPlanTab() {
+  const { t, i18n } = useTranslation()
+  const isAr = i18n.language === 'ar'
+  const queryClient = useQueryClient()
+
+  const { data: plans = [], isLoading } = useQuery<SPlan[]>({
+    queryKey: ['study-plans'],
+    queryFn: async () => (await api.get('/v1/student/study-plans')).data,
+  })
+
+  const toggleMutation = useMutation({
+    mutationFn: (taskId: number) =>
+      api.post(`/v1/student/study-plan-tasks/${taskId}/toggle`),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['study-plans'] }),
+  })
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center py-16">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    )
+  }
+
+  if (plans.length === 0) {
+    return (
+      <div className="py-12 text-center">
+        <CheckCircle2 className="mx-auto mb-3 h-12 w-12 text-gray-200" />
+        <p className="font-semibold text-gray-500">{t('study_plan.no_plans_title', 'No Study Plans Yet')}</p>
+        <p className="mt-1 text-sm text-gray-400">{t('study_plan.no_plans_desc', 'Enroll in a course to get a personalized study plan.')}</p>
+      </div>
+    )
+  }
+
+  const today = new Date().toISOString().split('T')[0]
+
+  return (
+    <div className="space-y-6" dir={isAr ? 'rtl' : 'ltr'}>
+      <div>
+        <h2 className="text-xl font-bold text-gray-900">{t('study_plan.title', 'My Study Plan')}</h2>
+        <p className="text-sm text-gray-500">{t('study_plan.subtitle', 'Your personalized learning schedule')}</p>
+      </div>
+
+      {plans.map((plan) => {
+        const thumb = plan.course?.thumbnail
+          ? (plan.course.thumbnail.startsWith('http')
+              ? plan.course.thumbnail
+              : `${API_BASE}/storage/${plan.course.thumbnail}`)
+          : null
+
+        const overdue   = plan.tasks.filter(t => !t.completed_at && t.scheduled_date < today)
+        const todayT    = plan.tasks.filter(t => !t.completed_at && t.scheduled_date === today)
+        const upcoming  = plan.tasks.filter(t => !t.completed_at && t.scheduled_date > today)
+        const completed = plan.tasks.filter(t => !!t.completed_at)
+
+        return (
+          <div key={plan.id} className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
+            {/* Header */}
+            <div className="border-b border-gray-100 bg-gray-50/50 px-5 py-4">
+              <div className="flex items-center gap-3">
+                {thumb && (
+                  <img src={thumb} alt="" className="h-11 w-11 rounded-lg object-cover shrink-0" />
+                )}
+                <div className="flex-1 min-w-0">
+                  <p className="font-bold text-gray-900 truncate">{plan.course?.title ?? t('study_plan.unknown_course', 'Course')}</p>
+                  <p className="text-xs text-gray-400">{plan.start_date} → {plan.end_date ?? t('study_plan.lifetime', 'Lifetime')}</p>
+                </div>
+                {plan.progress === 100 && <span className="text-yellow-500 text-xl">🏆</span>}
+              </div>
+              {/* Progress */}
+              <div className="mt-3">
+                <div className="mb-1 flex justify-between text-xs">
+                  <span className="text-gray-400">{plan.completed_tasks}/{plan.total_tasks} {t('study_plan.tasks_done', 'tasks done')}</span>
+                  <span className="font-bold text-primary">{plan.progress}%</span>
+                </div>
+                <div className="h-2 overflow-hidden rounded-full bg-gray-200">
+                  <div className="h-2 rounded-full bg-primary transition-all duration-500" style={{ width: `${plan.progress}%` }} />
+                </div>
+              </div>
+            </div>
+
+            {/* Tasks */}
+            {plan.total_tasks === 0 ? (
+              <div className="px-5 py-8 text-center text-sm text-gray-400">
+                {t('study_plan.no_content', 'Content coming soon')}
+              </div>
+            ) : (
+              <div className="divide-y divide-gray-50 px-5 py-2">
+                {overdue.length > 0 && (
+                  <SPTaskGroup label={t('study_plan.overdue', 'Overdue')} labelClass="text-red-500" tasks={overdue} onToggle={id => toggleMutation.mutate(id)} busy={toggleMutation.isPending} />
+                )}
+                {todayT.length > 0 && (
+                  <SPTaskGroup label={t('study_plan.today', "Today's Tasks")} labelClass="text-primary" tasks={todayT} onToggle={id => toggleMutation.mutate(id)} busy={toggleMutation.isPending} />
+                )}
+                {upcoming.length > 0 && (
+                  <SPTaskGroup label={t('study_plan.upcoming', 'Upcoming')} labelClass="text-gray-400" tasks={upcoming.slice(0, 5)} onToggle={id => toggleMutation.mutate(id)} busy={toggleMutation.isPending} />
+                )}
+                {completed.length > 0 && (
+                  <SPTaskGroup label={t('study_plan.completed', 'Completed')} labelClass="text-emerald-600" tasks={completed.slice(-3)} onToggle={id => toggleMutation.mutate(id)} busy={toggleMutation.isPending} isDone />
+                )}
+              </div>
+            )}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+function SPTaskGroup({ label, labelClass, tasks, onToggle, busy, isDone = false }: {
+  label: string; labelClass: string; tasks: SPTask[]; onToggle: (id: number) => void; busy: boolean; isDone?: boolean
+}) {
+  return (
+    <div className="py-3">
+      <p className={`mb-2 text-xs font-semibold uppercase tracking-wider ${labelClass}`}>{label}</p>
+      <div className="space-y-2">
+        {tasks.map(task => (
+          <div key={task.id} className="flex items-center gap-3">
+            <button
+              onClick={() => onToggle(task.id)}
+              disabled={busy}
+              className="shrink-0 focus:outline-none disabled:opacity-50"
+              title={isDone ? 'Mark incomplete' : 'Mark complete'}
+            >
+              {task.completed_at
+                ? <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+                : <div className="h-5 w-5 rounded-full border-2 border-gray-300 hover:border-primary transition-colors" />
+              }
+            </button>
+            <div className="flex-1 min-w-0">
+              <p className={`truncate text-sm ${task.completed_at ? 'line-through text-gray-400' : 'text-gray-700'}`}>
+                {task.type === 'quiz' ? '📝 ' : '🎬 '}{task.title}
+              </p>
+            </div>
+            <span className="shrink-0 text-xs text-gray-400">{task.scheduled_date}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
 }

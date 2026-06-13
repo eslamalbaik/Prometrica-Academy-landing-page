@@ -306,6 +306,7 @@
       "btn2": "Contact Advisor"
     }
   },
+  "tab_study_plan": "Study Plan",
   "tab_subscriptions": "Subscriptions",
   "tab_courses": "Courses",
   "tab_certificates": "Certificates",
@@ -384,5 +385,24 @@
     "success_title": "Payment Successful!",
     "success_desc": "You are now enrolled. Redirecting to your dashboard…",
     "instant_access": "You get instant access after payment."
+  },
+  "study_plan": {
+    "title": "My Study Plan",
+    "subtitle": "Your personalized learning schedule",
+    "no_plans_title": "No Study Plans Yet",
+    "no_plans_desc": "Enroll in a course to automatically receive a personalized study plan.",
+    "browse_courses": "Browse Courses",
+    "unknown_course": "Course",
+    "lifetime": "Lifetime",
+    "tasks_done": "tasks done",
+    "overdue": "Overdue",
+    "today": "Today's Tasks",
+    "upcoming": "Upcoming",
+    "completed": "Completed",
+    "no_content": "Content coming soon",
+    "no_content_desc": "This course has no lessons yet. Tasks will appear once content is added.",
+    "unsubscribe": "Unsubscribe",
+    "unsubscribe_weekly": "Unsubscribe from weekly emails",
+    "back_dashboard": "Back to Dashboard"
   }
 }
