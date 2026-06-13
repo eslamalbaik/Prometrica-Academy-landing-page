@@ -5,9 +5,7 @@ import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { api } from "@/lib/api";
-
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+import { api, API_ORIGIN as API_BASE } from "@/lib/api";
 import { 
   User, 
   BookOpen, 

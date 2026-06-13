@@ -5,8 +5,7 @@ import { useTranslation } from "react-i18next";
 import { Download, FileText, Loader2, Library, AlertCircle, ArrowLeft } from "lucide-react";
 import { api } from "@/lib/api";
 import { pageTitle } from "@/lib/siteMeta";
-
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
+import { API_ORIGIN as API_BASE } from "@/lib/api";
 
 interface LibraryFile {
   id: number;

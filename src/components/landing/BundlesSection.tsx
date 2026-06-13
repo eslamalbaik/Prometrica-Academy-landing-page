@@ -8,7 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
 import { getLoginUrl } from "@/lib/authSession";
 
-const API_ORIGIN = (import.meta.env.VITE_API_ORIGIN || import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/\/$/, '');
+import { API_ORIGIN } from "@/lib/api";
 
 interface BundleCourse {
   id: number;

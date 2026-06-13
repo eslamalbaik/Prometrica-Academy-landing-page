@@ -1,8 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-
-const API_ORIGIN = (import.meta.env.VITE_API_ORIGIN || import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/\/$/, '');
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { api } from "@/lib/api";
+import { api, API_ORIGIN } from "@/lib/api";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";

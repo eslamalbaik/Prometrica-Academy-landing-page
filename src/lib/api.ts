@@ -2,7 +2,8 @@ import axios from 'axios';
 import i18n from '@/i18n';
 
 // API origin is env-driven for production; falls back to local dev.
-const API_ORIGIN = (import.meta.env.VITE_API_URL || import.meta.env.VITE_API_ORIGIN || 'http://127.0.0.1:8000').replace(/\/$/, '');
+// Single source of truth — import this everywhere instead of re-declaring.
+export const API_ORIGIN = (import.meta.env.VITE_API_URL || import.meta.env.VITE_API_ORIGIN || 'http://127.0.0.1:8000').replace(/\/$/, '');
 
 /** Generate or retrieve a persistent browser device fingerprint (UUID v4). */
 function getDeviceId(): string {

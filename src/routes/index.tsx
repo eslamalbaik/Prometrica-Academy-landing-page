@@ -1,6 +1,5 @@
 import { useState } from "react";
-
-const API_ORIGIN = (import.meta.env.VITE_API_ORIGIN || import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/\/$/, '');
+import { API_ORIGIN } from '@/lib/api';
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "framer-motion";

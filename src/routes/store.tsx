@@ -8,8 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { pageTitle } from "@/lib/siteMeta";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
+import { API_ORIGIN as API_BASE } from "@/lib/api";
 
 interface StoreProduct {
   id: number;
