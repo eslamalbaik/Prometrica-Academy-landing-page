@@ -561,10 +561,19 @@ export function QuizPlayer({ quizId, onQuizPassed, onContinueLearning, onBack }:
                           return (
                             <div key={option.id} className={`flex items-center justify-between p-3 rounded-xl border text-sm ${cardStyle}`}>
                               <div className="flex items-center gap-3">
-                                <div className={`h-6 w-6 rounded-lg border flex items-center justify-center text-xs font-bold ${labelStyle}`}>
+                                <div className={`h-6 w-6 rounded-lg border flex items-center justify-center text-xs font-bold flex-shrink-0 ${labelStyle}`}>
                                   {optionLabel}
                                 </div>
-                                <span className="font-semibold leading-snug">{option.option_text}</span>
+                                <div className="flex flex-col gap-1">
+                                  {option.image_path && (
+                                    <img
+                                      src={`${(import.meta.env.VITE_API_URL || 'https://api.prometricaacademy.org')}/storage/${option.image_path}`}
+                                      alt={option.option_text}
+                                      className="max-h-16 max-w-[120px] rounded-lg object-contain"
+                                    />
+                                  )}
+                                  <span className="font-semibold leading-snug">{option.option_text}</span>
+                                </div>
                               </div>
                               
                               {isUserAnswer && (
