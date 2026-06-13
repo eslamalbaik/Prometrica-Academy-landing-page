@@ -189,12 +189,19 @@ function CourseDetails() {
           <div className="lg:col-span-2 space-y-16 py-12 lg:pe-8">
             
             {/* About This Course */}
-            <section>
-              <h2 className="text-2xl font-bold text-foreground mb-6">{t('about_this_course', 'About This Course')}</h2>
-              <div className="prose prose-slate dark:prose-invert max-w-none text-muted-foreground leading-relaxed">
-                <p>{course.description || course.short_description}</p>
-              </div>
-            </section>
+            {(course.description || course.short_description) && (
+              <section>
+                <h2 className="text-2xl font-bold text-foreground mb-6">{t('about_this_course', 'About This Course')}</h2>
+                <div className="prose prose-slate dark:prose-invert max-w-none text-muted-foreground leading-relaxed space-y-4">
+                  {(course.description || course.short_description)
+                    .split('\n')
+                    .filter((line: string) => line.trim() !== '')
+                    .map((paragraph: string, i: number) => (
+                      <p key={i}>{paragraph}</p>
+                    ))}
+                </div>
+              </section>
+            )}
 
             {/* Course Curriculum */}
             <section>
